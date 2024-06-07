@@ -1,30 +1,33 @@
 # Imports 
 import networkx as nx
-
-# Create a directed graph
-G = nx.DiGraph()
-
-# Add edges with fuel cost and time cost
-G.add_edge('A', 'B', fuel_cost=5, time_cost=6)
-G.add_edge('A', 'D', fuel_cost=10, time_cost=17)
-G.add_edge('B', 'C', fuel_cost=3, time_cost=2)
-G.add_edge('C', 'A', fuel_cost=2, time_cost=2)
-G.add_edge('C', 'D', fuel_cost=1, time_cost=5)
+import random
 
 
-# Define the combined weight function
-def combined_weight(u, v, d, w_f=0.5, w_t=0.5):
-    return w_f * d['fuel_cost'] + w_t * d['time_cost']
+def createGraphInstance(min_nodes, max_nodes, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, connect_prob):
 
-# Set weights for fuel cost and time cost
-w_f = 0.4  # Weight for fuel cost
-w_t = 0.6  # Weight for time cost
+    # Generate a random number of nodes
+    num_nodes = random.randint(min_nodes, max_nodes)
+    # ...
+    connect_prob = 1 - connect_prob
 
-# Find the shortest path using the combined weight function
-source = 'A'
-target = 'D'
-path = nx.dijkstra_path(G, source=source, target=target, weight=lambda u, v, d: combined_weight(u, v, d, w_f, w_t))
-path_length = nx.dijkstra_path_length(G, source=source, target=target, weight=lambda u, v, d: combined_weight(u, v, d, w_f, w_t))
+    # Create a directed graph
+    G = nx.DiGraph()
 
-print(f"Shortest path: {path}")
-print(f"Path length: {path_length}")
+    # Add nodes
+    G.add_nodes_from(range(num_nodes))
+
+    # Add a random number of edges with random weights
+    for i in range(num_nodes):
+        for j in range(num_nodes):
+            if i != j:
+                if random.random() > connect_prob:  # Randomly decide whether to add an edge
+                    fuel_cost = random.randint(min_weight_fuel, max_weight_fuel)
+                    time_cost = random.randint(min_weight_time, max_weight_time)
+                    G.add_edge(i, j, fuel_cost=fuel_cost, time_cost=time_cost)
+                    G.add_edge(j, i, fuel_cost=fuel_cost, time_cost=time_cost)
+                else:
+                    fuel_cost = random.randint(min_weight_fuel, max_weight_fuel)
+                    time_cost = random.randint(min_weight_time, max_weight_time)
+                    G.add_edge(j, i, fuel_cost=fuel_cost, time_cost=time_cost)
+
+    return G
