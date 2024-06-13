@@ -2,10 +2,10 @@
 import networkx as nx
 import random
 
-def createGraphInstance(min_nodes, max_nodes, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, min_degree):
+def createGraphInstance(num_nodes, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, min_degree):
 
     # Generate a random number of nodes
-    num_nodes = random.randint(min_nodes, max_nodes)
+    #num_nodes = random.randint(min_nodes, max_nodes)
     print(f"The current number of nodes is {num_nodes}")
 
     # Create a directed graph

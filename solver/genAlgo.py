@@ -1,15 +1,7 @@
-# IMPORTS 
-#from instance_gen import *
 
-# ALGORITHM PARAMETERS 
-N = 50 #nb of individuals in the initial population
-nb_generations = 100
-proba_mutation = 0.2 #proba for an ind to be muted 
-proba_mutation_gene = 0.3 #proba for a gene to be muted 
-proba_crossing = 0.4
 
 # FITNESS FUNCTION 
-def fitness(individual): #, graph) : 
+def fitness(individual, graph) : 
     """
     @param individual := a solution, id est a list of lists of integers (list of transfers)
 
@@ -44,11 +36,6 @@ def fitness(individual): #, graph) :
         res = overall_consumption + overall_delay
     return res 
 
-# TEST 
-T1 = [1, 3, 5]
-T2 = [4, 2]
-individual = [T1, T2]
-res = fitness(individual)
-print(res)
+
 
 
