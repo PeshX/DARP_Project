@@ -42,13 +42,25 @@ def fitness(individual, graph) :
 # MUTATION
 
 def IntegerRandMutation(chromosome, p, passengers_list):
-
+    # Filter passenger list to avoid generating the id of a passenger already present in the chromosome
+    filtered_list = [passenger_id for passenger_id in passengers_list if passenger_id not in chromosome]
+    # Append '0' means that a specific passenger can be excluded from that specific chromosome
+    filtered_list.append(0)
+    print(filtered_list)
+    # Iterate over all chromosome to randomly mutate its entries
     for i in range(0,len(chromosome)-1):
         if p > random.uniform(0.0,1.0):
-            chromosome[i] = random.randint(0, max(passengers_list))
+            chromosome[i] = random.choice(filtered_list)
 
     return chromosome
 
+
+chromosome1 = [1,2,3,4]
+passenger_list = [1,2,3,4,5,6,7,8,9]
+prob_mutation = 0.4
+
+mutated_ch = IntegerRandMutation(chromosome1,prob_mutation,passenger_list)
+print(mutated_ch)
 
 # RECOMBINATION
 
