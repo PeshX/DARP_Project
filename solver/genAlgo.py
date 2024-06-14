@@ -38,7 +38,6 @@ def fitness(individual, graph) :
         res = overall_consumption + overall_delay
     return res 
 
-
 # MUTATION
 
 def IntegerRandMutation(chromosome, p, passengers_list):
@@ -54,14 +53,6 @@ def IntegerRandMutation(chromosome, p, passengers_list):
 
     return chromosome
 
-
-chromosome1 = [1,2,3,4]
-passenger_list = [1,2,3,4,5,6,7,8,9]
-prob_mutation = 0.4
-
-mutated_ch = IntegerRandMutation(chromosome1,prob_mutation,passenger_list)
-print(mutated_ch)
-
 # RECOMBINATION
 
 def LineRecombIntegers(individuals, p, passengers_list):
@@ -71,31 +62,42 @@ def LineRecombIntegers(individuals, p, passengers_list):
 
     len_short_chr = len(min(individuals,key=len))
 
-    sx_half_long_chr = np.floor(len(min(individuals,key=len))/2)
-    low_index = random.randint(0, sx_half_long_chr)
+    sx_half_long_chr = int(np.floor(len(min(individuals,key=len))/2))
+    low_index = random.randint(0, sx_half_long_chr-1)
+    print(low_index)
 
-    while (low_index+len_short_chr < len(max(individuals,key=len)-1)):
+    while (low_index+len_short_chr < len(max(individuals,key=len))-1):
                     
            low_index = random.randint(0, sx_half_long_chr)
 
-    if len(individuals[1]) > len(individuals[2]):
-        long_index = 1
-        short_index = 2
-
-    else:
-        long_index = 2
+    if len(individuals[0]) > len(individuals[1]):
+        long_index = 0
         short_index = 1
 
+    else:
+        long_index = 1
+        short_index = 0
 
-    for i in range(0,len(min(individuals,key=len))-1):
-
+    for i in range(0,len(min(individuals,key=len))):
+        print(i)
 
         t = alpha * individuals[long_index][i+low_index] +  beta * individuals[short_index][i]
         s = alpha * individuals[short_index][i] +  beta * individuals[long_index][i+low_index]
 
-        while((np.floor(t+0.5) in passengers_list) and (np.floor(s+0.5) in passengers_list)):
-            individuals[1][i] = np.floor(t+0.5)
-            individuals[2][i] = np.floor(s+0.5)
+        while((int(np.floor(t+0.5)) in passengers_list) and (int(np.floor(s+0.5)) in passengers_list)):
+            individuals[long_index][i] = int(np.floor(t+0.5))
+            individuals[short_index][i] = int(np.floor(s+0.5))
+            t = alpha * individuals[long_index][i+low_index] +  beta * individuals[short_index][i]
+            s = alpha * individuals[short_index][i] +  beta * individuals[long_index][i+low_index]
+            
 
     return individuals
 
+chromosome1 = [1,2,3,4]
+chromosome2 = [5,6,7,8,9]
+individual = [chromosome1, chromosome2]
+passenger_list = [1,2,3,4,5,6,7,8,9]
+prob_mutation = 0.5
+
+mutated_ind = LineRecombIntegers(individual,prob_mutation,passenger_list)
+print(mutated_ind)
