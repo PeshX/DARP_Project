@@ -26,11 +26,18 @@ def fitness(individual, graph) :
             passenger1 = transfer[stop]
             passenger2 = transfer[stop+1]
 
-            weights = [0] # to modify : fetch the weights from the graph for the edge (passenger1, passenger2)
+            edge_data = graph.get_edge_data(passenger1, passenger2) # fetch the weights from the graph for the edge (passenger1, passenger2)
+            weights.append(edge_data)
 
+        print("weights =", weights)
         for w in weights : 
-            consumption += w # to modify : up the consumption accordingly to the weight 
-            delay += w # to modify : up the delay accordingly to the weight 
+             if w != None : 
+                print("w=", w)
+                print("fuel cost", w['fuel_cost'])
+
+           
+                consumption += w['fuel_cost'] # up the consumption accordingly to the weight 
+                delay += w['time_cost'] # up the delay accordingly to the weight 
         
         overall_consumption += consumption
         overall_delay += delay 
@@ -99,5 +106,53 @@ individual = [chromosome1, chromosome2]
 passenger_list = [1,2,3,4,5,6,7,8,9]
 prob_mutation = 0.5
 
-mutated_ind = LineRecombIntegers(individual,prob_mutation,passenger_list)
-print(mutated_ind)
+#mutated_ind = LineRecombIntegers(individual,prob_mutation,passenger_list)
+#print(mutated_ind)
+
+# SELECTION 
+
+# To compare different strategies, we will implement a roulette wheel selection and a tournament selection 
+# Then, we'll get to decide which one is the most suitable for our DARP problem 
+
+# 1 - ROULETTE WHEEL SELECTION 
+
+def roulette_wheel_selection(population, fitness, graph): 
+    """
+    @param population, a pool of individuals/solutions 
+    @param fitness, the numeric function that evaluates the "goodness" of a solution 
+    return a list of selected solutions/individuals, according to the roulette wheel selection
+    """
+
+    selected_ind = []
+    #sum_of_fitnesses = 0 
+    fitnesses = []
+    for ind in population: 
+        fitnesses.append(fitness(ind, graph))
+        print("fitnesses list", fitnesses)
+
+    sum_probabilities = 0
+    probabilities = {}
+
+    sum_of_fitnesses = sum(fitnesses)
+    print("sum of fitnesses", sum_of_fitnesses)
+
+    cpt = 0 
+    for ind in population: 
+        
+        probabilities[ind] = sum_probabilities + fitnesses[cpt]/sum_of_fitnesses
+        sum_probabilities += probabilities[ind]
+        cpt+=1
+    
+    sorted_probabilities = dict(sorted(probabilities.items(), key=lambda x:x[1]))
+    random_number = random.random()
+    
+    for ind in population: 
+        if random_number > sorted_probabilities[ind] : 
+            selected_ind.append(ind)
+    return selected_ind
+
+    
+    
+# 2 - TOURNAMENT SELECTION 
+
+

@@ -1,5 +1,5 @@
 # IMPORTS 
-from genAlgo import *
+#from genAlgo import *
 import random 
 
 """
@@ -51,8 +51,8 @@ def generate_initial_pop(nb_individuals, nb_passengers, capacities):
 
 def generate_random_lists(n, sizes):
     # Check if the sum of sizes equals n
-    if sum(sizes) != n:
-        raise ValueError("The sum of the sizes must equal n.")
+    """if sum(sizes) != n:
+        raise ValueError("The sum of the sizes must equal n.")"""
     
     # Create a list of numbers from 1 to N
     numbers = list(range(1, n + 1))
