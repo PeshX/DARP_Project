@@ -62,52 +62,46 @@ def IntegerRandMutation(chromosome, p, passengers_list):
 
 # RECOMBINATION
 
-def LineRecombIntegers(individuals, p, passengers_list):
+def RecombIntegers(individuals, p, passengers_list):
 
-    alpha = random.uniform(-p, 1+p)
-    beta = random.uniform(-p, 1+p)
-
-    len_short_chr = len(min(individuals,key=len))
-
-    sx_half_long_chr = int(np.floor(len(min(individuals,key=len))/2))
-    low_index = random.randint(0, sx_half_long_chr-1)
-    print(low_index)
-
-    while (low_index+len_short_chr < len(max(individuals,key=len))-1):
-                    
-           low_index = random.randint(0, sx_half_long_chr)
-
-    if len(individuals[0]) > len(individuals[1]):
-        long_index = 0
-        short_index = 1
-
+    # Find minimum length chromosome and split it
+    min_len = len(min(individuals,key=len))
+    if min_len == len(individuals[0]):
+        min_ch = 0
+        max_ch = 1
+        split_index = np.random.randint(2,int(len(individuals[0])/2), dtype=int)
+        win1 = individuals[0][0:split_index]
+        win2 = individuals[0][split_index:]
     else:
-        long_index = 1
-        short_index = 0
+        min_ch = 1
+        max_ch = 0
+        split_index = np.random.randint(2,int(len(individuals[0])/2), dtype=int)
+        win1 = individuals[1][0:split_index]
+        win2 = individuals[1][split_index:]
 
-    for i in range(0,len(min(individuals,key=len))):
-        print(i)
+    print(win1,win2)
 
-        t = alpha * individuals[long_index][i+low_index] +  beta * individuals[short_index][i]
-        s = alpha * individuals[short_index][i] +  beta * individuals[long_index][i+low_index]
+    print(min_ch)
 
-        while((int(np.floor(t+0.5)) in passengers_list) and (int(np.floor(s+0.5)) in passengers_list)):
-            individuals[long_index][i] = int(np.floor(t+0.5))
-            individuals[short_index][i] = int(np.floor(s+0.5))
-            t = alpha * individuals[long_index][i+low_index] +  beta * individuals[short_index][i]
-            s = alpha * individuals[short_index][i] +  beta * individuals[long_index][i+low_index]
-            
+    crx_index1 = random.randint(0,len(individuals[min_ch])-len(max([win1,win2],key=len)))
+    crx_index2 = random.randint(crx_index1, len(individuals[max_ch])-len(win2))
+
+    print(crx_index1,crx_index2)
+
+    # Swap content of the windows with the second chromosome
+    individuals[min_ch][0:split_index],  individuals[max_ch][crx_index1:(len(win1)+crx_index1)] = individuals[max_ch][crx_index1:(len(win1)+crx_index1)], individuals[min_ch][0:split_index]
+    print(individuals)
+    individuals[min_ch][split_index:],  individuals[max_ch][crx_index2:(len(win2)+crx_index2)] = individuals[max_ch][crx_index2:(len(win2)+crx_index2)], individuals[min_ch][split_index:] 
 
     return individuals
 
-chromosome1 = [1,2,3,4]
-chromosome2 = [5,6,7,8,9]
+chromosome1 = [1,2,3,4,5,6,7,8]
+chromosome2 = [10,11,12,13,14,15,16,17,18,19]
 individual = [chromosome1, chromosome2]
 passenger_list = [1,2,3,4,5,6,7,8,9]
 prob_mutation = 0.5
 
-#mutated_ind = LineRecombIntegers(individual,prob_mutation,passenger_list)
-#print(mutated_ind)
+print(RecombIntegers(individual,prob_mutation,passenger_list))
 
 # SELECTION 
 
