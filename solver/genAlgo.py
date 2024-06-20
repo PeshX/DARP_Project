@@ -47,7 +47,7 @@ def fitness(individual, graph) :
 
 # MUTATION
 
-def IntegerRandMutation(chromosome, p, passengers_list):
+def IntegerRandMutation(chromosome, individual, p, passengers_list):
     # Filter passenger list to avoid generating the id of a passenger already present in the chromosome
     filtered_list = [passenger_id for passenger_id in passengers_list if passenger_id not in chromosome]
     # Append '0' means that a specific passenger can be excluded from that specific chromosome
@@ -60,6 +60,9 @@ def IntegerRandMutation(chromosome, p, passengers_list):
 
     return chromosome
 
+
+### TODO: add a permutation of the chromosome as a mutation operator
+
 # RECOMBINATION
 
 def RecombIntegers(individuals, p, passengers_list):
@@ -69,7 +72,7 @@ def RecombIntegers(individuals, p, passengers_list):
     if min_len == len(individuals[0]):
         min_ch = 0
         max_ch = 1
-        split_index = np.random.randint(2,int(len(individuals[0])/2), dtype=int)
+        split_index = np.random.randint(2,int(len(individuals[0])/2), dtype=int) ### TODO: pass by parameter the maximum length for the window -> refined search
         win1 = individuals[0][0:split_index]
         win2 = individuals[0][split_index:]
     else:
