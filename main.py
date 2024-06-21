@@ -13,10 +13,10 @@ proba_mutation_gene = 0.3 #proba for a gene to be muted
 proba_crossing = 0.4
 
 # INSTANCE CREATION 
-nb_passengers = 10
-nb_of_diff_starting_points = 10
+nb_passengers = 15
+nb_of_diff_starting_points = 15
 nb_of_diff_destinations = 10
-nb_of_vehicles = 10
+nb_of_vehicles = 5
 vehicles_capacities = np.random.choice(range(1, 6), nb_of_vehicles).tolist()
 
 num_nodes = nb_of_diff_destinations + nb_of_diff_starting_points # pickout/dropout points 
@@ -36,8 +36,29 @@ individual = [T1, T2]
 
 initial_pop =  generate_initial_pop(N, nb_passengers, vehicles_capacities)
 
-selected_ind_by_roulette = roulette_wheel_selection(initial_pop, fitness, G) 
-print(selected_ind_by_roulette)
+# SELECTION PROCESS 
+
+selected_individuals_by_roulette = roulette_wheel_selection(initial_pop, fitness, G) 
+selected_individuals_by_tournament = tournament_selection(initial_pop, fitness, G, 3)
+
+print("WITH ROULETTE SELECTION, THE SELECTIONED INDIVIDUALS ARE:")
+for ind in selected_individuals_by_roulette: 
+    print(ind)
+
+print("WITH TOURNAMENT SELECTION, THE SELECTED INDIVIDUALS ARE:")
+for ind in selected_individuals_by_tournament: 
+    print(ind)
+
+"""
+To compare both approach, we can compare mean of fitnesses of the selected individuals  
+The bigger the sum is, the worst are the individual, that's a first metric
+"""
+mean_fitness_roulette = compute_mean_fitness(selected_individuals_by_roulette, fitness, G)
+mean_fitness_tournament = compute_mean_fitness(selected_individuals_by_tournament, fitness, G)
+
+print("mean fitness roulette: ", mean_fitness_roulette)
+print("mean fitness tournament: ", mean_fitness_tournament)
+
 
 
 

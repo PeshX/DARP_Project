@@ -29,11 +29,11 @@ def fitness(individual, graph) :
             edge_data = graph.get_edge_data(passenger1, passenger2) # fetch the weights from the graph for the edge (passenger1, passenger2)
             weights.append(edge_data)
 
-        print("weights =", weights)
+        #print("weights =", weights)
         for w in weights : 
              if w != None : 
-                print("w=", w)
-                print("fuel cost", w['fuel_cost'])
+                #print("w=", w)
+                #print("fuel cost", w['fuel_cost'])
 
            
                 consumption += w['fuel_cost'] # up the consumption accordingly to the weight 
@@ -44,6 +44,23 @@ def fitness(individual, graph) :
     
         res = overall_consumption + overall_delay
     return res 
+
+
+def compute_mean_fitness(individuals, fitness, graph):
+    """
+    Computes the mean fitness of a list of individuals.
+    
+    @param individuals: a list of individuals/solutions
+    @param fitness: the numeric function that evaluates the "goodness" of a solution
+    @param graph: the instance
+    
+    @return: the mean fitness of the individuals
+    """
+
+    fitnesses = [fitness(ind, graph) for ind in individuals]
+    mean_fitness = np.mean(fitnesses)
+    
+    return mean_fitness
 
 # MUTATION
 
@@ -114,39 +131,79 @@ def roulette_wheel_selection(population, fitness, graph):
     """
     @param population, a pool of individuals/solutions 
     @param fitness, the numeric function that evaluates the "goodness" of a solution 
+    @param graph, the instance 
     return a list of selected solutions/individuals, according to the roulette wheel selection
+            ##and a list of the corresponding ids 
     """
 
+    #individuals_by_id = {}
     selected_ind = []
+    #selected_ids = []
     #sum_of_fitnesses = 0 
     fitnesses = []
+
     for ind in population: 
         fitnesses.append(fitness(ind, graph))
-        print("fitnesses list", fitnesses)
+        #print("fitnesses list", fitnesses)
 
     sum_probabilities = 0
     probabilities = {}
 
     sum_of_fitnesses = sum(fitnesses)
-    print("sum of fitnesses", sum_of_fitnesses)
+    #print("sum of fitnesses", sum_of_fitnesses)
 
-    cpt = 0 
+    id = 0 
+    #print("probabilities:", probabilities)
     for ind in population: 
         
+        #print("ind",id, ":" ,ind)
+        """
         probabilities[ind] = sum_probabilities + fitnesses[cpt]/sum_of_fitnesses
         sum_probabilities += probabilities[ind]
         cpt+=1
+        """
+
+        probabilities[id] = sum_probabilities + fitnesses[id] / sum_of_fitnesses
+        sum_probabilities += probabilities[id]
+        id+=1
     
     sorted_probabilities = dict(sorted(probabilities.items(), key=lambda x:x[1]))
     random_number = random.random()
     
+    id = 0
     for ind in population: 
-        if random_number > sorted_probabilities[ind] : 
+        if random_number > sorted_probabilities[id] : 
             selected_ind.append(ind)
-    return selected_ind
+            #selected_ids.append(id)
+        id += 1
+    return selected_ind# ,selected_ids
 
     
     
 # 2 - TOURNAMENT SELECTION 
 
+def tournament_selection(population, fitness, graph, tournament_size): 
+
+    """
+    @param population, a pool of individuals/solutions 
+    @param fitness, the numeric function that evaluates the "goodness" of a solution 
+    @param graph, the instance 
+    @param tournamen_size, the nb of individuals to participate in each tournament 
+    return a list of selected solutions/individuals, according to the simple tournament selection process based on fitness 
+    """
+
+    selected_ind = []
+    population_size = len(population)
+
+    for _ in range(population_size):
+        tournament = random.sample(population, tournament_size) # random select of a sample individuals in the pop to participate in the tournament 
+        
+        tournament_fitnesses = [fitness(ind, graph) for ind in tournament]
+        
+        best_individual = tournament[tournament_fitnesses.index(max(tournament_fitnesses))]
+        
+        if best_individual not in selected_ind:
+            selected_ind.append(best_individual)
+
+    return selected_ind
 
