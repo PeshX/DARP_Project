@@ -77,51 +77,49 @@ def IntegerRandMutation(chromosome, individual, p, passengers_list):
 
     return chromosome
 
+def MutationCustomDARPT(individual, p, num_transfers):
+        # Overcoming probability of mutation
+        if p > random.uniform(0.0,1.0):
+            # Randomly choose a transfer to be mutated
+            idMutatedTransfer = random.randint(0,num_transfers-1)
+            # Apply custom mutation to the selected transfer -> shuffle the passengers
+            random.shuffle(individual[idMutatedTransfer])
 
-### TODO: add a permutation of the chromosome as a mutation operator
+        return individual
 
 # RECOMBINATION
 
-def RecombIntegers(individuals, p, passengers_list):
+def RecombIntegers(individuals, max_window_size):
 
-    # Find minimum length chromosome and split it
+    # Check on the maximum sieze of the window
+    if max_window_size > int(len(individuals[0])/2):
+            max_window_size = int(len(individuals[0])/2)
+
+    # Find minimum length chromosome and split it in windows
     min_len = len(min(individuals,key=len))
     if min_len == len(individuals[0]):
         min_ch = 0
-        max_ch = 1
-        split_index = np.random.randint(2,int(len(individuals[0])/2), dtype=int) ### TODO: pass by parameter the maximum length for the window -> refined search
+        max_ch = 1           
+        split_index = np.random.randint(2,max_window_size, dtype=int)
         win1 = individuals[0][0:split_index]
         win2 = individuals[0][split_index:]
     else:
         min_ch = 1
         max_ch = 0
-        split_index = np.random.randint(2,int(len(individuals[0])/2), dtype=int)
+        split_index = np.random.randint(2,max_window_size, dtype=int)
         win1 = individuals[1][0:split_index]
         win2 = individuals[1][split_index:]
 
-    print(win1,win2)
-
-    print(min_ch)
-
+    # Computing indexes for the crossover of each window
     crx_index1 = random.randint(0,len(individuals[min_ch])-len(max([win1,win2],key=len)))
     crx_index2 = random.randint(crx_index1, len(individuals[max_ch])-len(win2))
 
-    print(crx_index1,crx_index2)
-
     # Swap content of the windows with the second chromosome
     individuals[min_ch][0:split_index],  individuals[max_ch][crx_index1:(len(win1)+crx_index1)] = individuals[max_ch][crx_index1:(len(win1)+crx_index1)], individuals[min_ch][0:split_index]
-    print(individuals)
     individuals[min_ch][split_index:],  individuals[max_ch][crx_index2:(len(win2)+crx_index2)] = individuals[max_ch][crx_index2:(len(win2)+crx_index2)], individuals[min_ch][split_index:] 
 
     return individuals
-
-chromosome1 = [1,2,3,4,5,6,7,8]
-chromosome2 = [10,11,12,13,14,15,16,17,18,19]
-individual = [chromosome1, chromosome2]
-passenger_list = [1,2,3,4,5,6,7,8,9]
-prob_mutation = 0.5
-
-print(RecombIntegers(individual,prob_mutation,passenger_list))
+    
 
 # SELECTION 
 
