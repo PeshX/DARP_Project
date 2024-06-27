@@ -4,6 +4,7 @@ import pygad as ga
 import networkx as nx
 from instance_gen import *
 from solver import *
+import matplotlib.pyplot as plt
 
 # ALGORITHM PARAMETERS 
 N = 10 #nb of individuals in the initial population
@@ -60,23 +61,75 @@ print("mean fitness roulette: ", mean_fitness_roulette)
 print("mean fitness tournament: ", mean_fitness_tournament)
 
 # GENETIC ALGORITHM 
+
+# 1 - INITIALIZATION 
 nb_iterations = 0 
+selection = "roulette" #"tournament"
 initial_population = generate_initial_pop(nb_individuals=N, nb_passengers=nb_passengers, capacities=vehicles_capacities)
 
 parent_population = initial_population
 
-# data for comparison 
+# 2 - PREPARE DATA FOR PERFORMANCE ANALYTICS 
 best_fitness_from_each_gen = []
 mean_fitness_first_X_ind_from_each_gen = []
+X = 5
 mean_of_fitness_whole_pop_from_each_gen = []
 
-# NB : try with different selection processes 
-
+# 3 - RUNNING THE ALGORITHM 
 while (nb_iterations <= nb_generations): 
-    child_population = generate_next_generation(parent_population, fitness, N) 
+    child_population = generate_next_generation(parent_population, fitness, N, selection, G)
     parent_population = child_population 
     nb_iterations += 1
 
-# REMEMBER TO FETCH DATA FOR THE PLOTS 
+    # FETCHING DATA FOR PERFORMANCE MEASUREMENTS 
+
+    # KPI1 : Fitness of the best individual of each generation 
+    sorted_child_population = sorted(child_population, key=lambda ind: fitness(ind, G))
+    best_ind_from_child_pop = sorted_child_population[0]
+    best_fitness = fitness(best_ind_from_child_pop,G) 
+    best_fitness_from_each_gen.append(best_fitness)
+
+    # KPI2 : Fitness of the first X individuals of each generation for the mean 
+    top_individuals = sorted_child_population[:X]
+    top_fitnesses = [fitness(ind, G) for ind in top_individuals]
+    mean_of_the_fitness_of_first_X_individuals = np.mean(top_fitnesses)
+    mean_fitness_first_X_ind_from_each_gen.append(mean_of_the_fitness_of_first_X_individuals)
+
+    # KPI3 : Fitness of all individuals of each generation 
+    fitnesses_of_whole_gen = [fitness(ind, G) for ind in child_population]
+    mean_fitness_of_whole_pop = np.mean(fitnesses_of_whole_gen)
+    mean_of_fitness_whole_pop_from_each_gen.append(mean_fitness_of_whole_pop)
 
 
+# PLOTTING 
+generation_indices = range(nb_generations+1)
+
+# NB : try with different selection processes 
+
+# PLOT 1 : evolution of the fitness along the reproduction process (best fitness for each gen)
+plt.plot(generation_indices, best_fitness_from_each_gen, label="Evolution of the best fitness of each generation")
+plt.xlabel('Generation')
+plt.ylabel('Best fitness')
+plt.show()
+
+# PLOT 2 : evolution of the mean of the fitness of the X best individuals along the reproduction process 
+plt.plot(generation_indices, mean_fitness_first_X_ind_from_each_gen, label='Evolution of the mean of the fitness of the f"{X} first best individuals')
+plt.xlabel('Generation')
+plt.ylabel('Mean of fitnesses of the f{X} best individuals of the generation')
+plt.show()
+
+# PLOT 3 : evolution of the mean of the fitness of all individuals along the reproduction process 
+plt.plot(generation_indices, mean_of_fitness_whole_pop_from_each_gen, label="Evolution of the mean fitness of the whole population")
+plt.xlabel('Generation')
+plt.ylabel('Mean of fitnesses of all individuals')
+plt.show()
+
+# PLOT 4 : all 3 curves 
+plt.figure(figsize=(10,8))
+plt.plot(generation_indices, best_fitness_from_each_gen, 'b', label="Evolution of the best fitness")
+plt.plot(generation_indices, mean_fitness_first_X_ind_from_each_gen, 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
+plt.plot(generation_indices, mean_of_fitness_whole_pop_from_each_gen, 'g', label="Evolution of the mean fitness of the whole population")
+plt.xlabel('Génération')
+plt.title(f"Evolution des fitness au cours des {nb_generations} générations pour une population de {N} individus")
+plt.legend()
+plt.show()

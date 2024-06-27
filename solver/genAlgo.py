@@ -210,18 +210,41 @@ def tournament_selection(population, fitness, graph, tournament_size):
 
 
 # GENERATE NEXT GENERATION (CHILDREN OF SELECTED PARENTS)
-def generate_next_generation(parent_population, fitness, nb_individuals): 
+def generate_next_generation(parent_population, fitness, nb_individuals, selection_process, graph): 
     """
     Combining all processes, it generates a new population from a parent one (through crossover, mutation, selection)
     It will be called at each iteration of the algorithm
     """
-
     children_pop = []
 
-    for i in range(nb_individuals): 
+    for i in range(nb_individuals-1): 
 
         # 1 : SELECTION 
 
+        if selection_process == "roulette" : 
+            selected_individuals = roulette_wheel_selection(parent_population, fitness, graph)
+
+            while(len(selected_individuals) < 2) : 
+                selected_individuals = roulette_wheel_selection(parent_population, fitness, graph)
+
+        elif selection_process == "tournament" : 
+            selected_individuals = tournament_selection(parent_population, fitness, graph, 3)
+
+            while(len(selected_individuals) < 2) : 
+                selected_individuals = tournament_selection(parent_population, fitness, graph)
+
+        random_picked_parents = random.sample(selected_individuals, 2)
+        parent1 = random_picked_parents[0]
+        parent2 = random_picked_parents[1]
+        
         # 2 : CROSSOVER 
 
         # 3 : MUTATION
+
+        
+    # add the best solution from the past generation 
+    sorted_parent_population = sorted(parent_population, key=lambda ind: fitness(ind, graph))
+    best_parent = sorted_parent_population[0]
+    children_pop[nb_individuals-1] = best_parent
+
+    return children_pop
