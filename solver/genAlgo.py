@@ -77,15 +77,15 @@ def IntegerRandMutation(chromosome, individual, p, passengers_list):
 
     return chromosome
 
-def MutationCustomDARPT(individual, p, num_transfers):
+def MutationCustomDARPT(child, p, num_transfers):
         # Overcoming probability of mutation
         if p > random.uniform(0.0,1.0):
             # Randomly choose a transfer to be mutated
             idMutatedTransfer = random.randint(0,num_transfers-1)
             # Apply custom mutation to the selected transfer -> shuffle the passengers
-            random.shuffle(individual[idMutatedTransfer])
+            random.shuffle(child[idMutatedTransfer])
 
-        return individual
+        return child
 
 # RECOMBINATION
 
@@ -119,8 +119,33 @@ def RecombIntegers(individuals, max_window_size):
     individuals[min_ch][split_index:],  individuals[max_ch][crx_index2:(len(win2)+crx_index2)] = individuals[max_ch][crx_index2:(len(win2)+crx_index2)], individuals[min_ch][split_index:] 
 
     return individuals
+
+def RecombIntegers(parent1, parent2, window_size, nb_passengers):
+
+    # TODO: see if it does make sense to do a check on the window's size
+
     
 
+    # Pick from parent1 a random set of passenger_id
+    passengers_cx = random.sample(list(range(1, nb_passengers+1)),window_size)
+
+    # Iterate over the transfer in the individual
+    # for transfer in range (1,len(parent2)):
+    #     # TODO: search for second solution in each transfer if the choices are present
+    #     parent2[transfer].index()
+    transfer_dims = [len(parent2[i]) for i in range(len(parent2))]
+    flattened_list = [x for xs in parent2 for x in xs]
+
+    # Check on the zero value
+
+
+    idx_passenger_in_transfer = [flattened_list.index(i) for i in passengers_cx] 
+    
+
+
+
+    return child
+    
 # SELECTION 
 
 # To compare different strategies, we will implement a roulette wheel selection and a tournament selection 
