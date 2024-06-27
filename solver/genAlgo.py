@@ -208,3 +208,20 @@ def tournament_selection(population, fitness, graph, tournament_size):
 
     return selected_ind
 
+
+# GENERATE NEXT GENERATION (CHILDREN OF SELECTED PARENTS)
+def generate_next_generation(parent_population, fitness, nb_individuals): 
+    """
+    Combining all processes, it generates a new population from a parent one (through crossover, mutation, selection)
+    It will be called at each iteration of the algorithm
+    """
+
+    children_pop = []
+
+    for i in range(nb_individuals): 
+
+        # 1 : SELECTION 
+
+        # 2 : CROSSOVER 
+
+        # 3 : MUTATION

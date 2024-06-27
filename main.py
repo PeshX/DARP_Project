@@ -59,6 +59,24 @@ mean_fitness_tournament = compute_mean_fitness(selected_individuals_by_tournamen
 print("mean fitness roulette: ", mean_fitness_roulette)
 print("mean fitness tournament: ", mean_fitness_tournament)
 
+# GENETIC ALGORITHM 
+nb_iterations = 0 
+initial_population = generate_initial_pop(nb_individuals=N, nb_passengers=nb_passengers, capacities=vehicles_capacities)
 
+parent_population = initial_population
+
+# data for comparison 
+best_fitness_from_each_gen = []
+mean_fitness_first_X_ind_from_each_gen = []
+mean_of_fitness_whole_pop_from_each_gen = []
+
+# NB : try with different selection processes 
+
+while (nb_iterations <= nb_generations): 
+    child_population = generate_next_generation(parent_population, fitness, N) 
+    parent_population = child_population 
+    nb_iterations += 1
+
+# REMEMBER TO FETCH DATA FOR THE PLOTS 
 
 
