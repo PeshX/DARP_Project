@@ -216,7 +216,7 @@ def tournament_selection(population, fitness, graph, tournament_size):
 
 
 # GENERATE NEXT GENERATION (CHILDREN OF SELECTED PARENTS)
-def generate_next_generation(parent_population, fitness, nb_individuals, selection_process, graph): 
+def generate_next_generation(parent_population, fitness, nb_individuals, selection_process, proba_mutation, graph): 
     """
     Combining all processes, it generates a new population from a parent one (through crossover, mutation, selection)
     It will be called at each iteration of the algorithm
@@ -243,10 +243,11 @@ def generate_next_generation(parent_population, fitness, nb_individuals, selecti
         parent1 = random_picked_parents[0]
         parent2 = random_picked_parents[1]
         
-        # 2 : CROSSOVER 
+        # 2 : CROSSOVER
+        child = CrossoverCustomDARPT(parent1, parent2) 
 
         # 3 : MUTATION
-
+        child_mutated = MutationCustomDARPT(child, proba_mutation)
         
     # add the best solution from the past generation 
     sorted_parent_population = sorted(parent_population, key=lambda ind: fitness(ind, graph))
