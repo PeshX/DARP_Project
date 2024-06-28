@@ -1,4 +1,4 @@
-from .graph import createGraphInstance
+from .instances import createGraphInstance
 
 __all__ = [
     "createGraphInstance"
