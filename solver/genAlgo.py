@@ -89,60 +89,51 @@ def MutationCustomDARPT(child, p, num_transfers):
 
 # RECOMBINATION
 
-def RecombIntegers(individuals, max_window_size):
+def CrossoverCustomDARPT(parent1, parent2):
 
-    # Check on the maximum sieze of the window
-    if max_window_size > int(len(individuals[0])/2):
-            max_window_size = int(len(individuals[0])/2)
+    # Save transfers dimension, equal for both parents
+    dims = [len(parent1[i]) for i in range(len(parent1))]
 
-    # Find minimum length chromosome and split it in windows
-    min_len = len(min(individuals,key=len))
-    if min_len == len(individuals[0]):
-        min_ch = 0
-        max_ch = 1           
-        split_index = np.random.randint(2,max_window_size, dtype=int)
-        win1 = individuals[0][0:split_index]
-        win2 = individuals[0][split_index:]
-    else:
-        min_ch = 1
-        max_ch = 0
-        split_index = np.random.randint(2,max_window_size, dtype=int)
-        win1 = individuals[1][0:split_index]
-        win2 = individuals[1][split_index:]
+    # Flatten list of lists in a single list
+    par1 = [x for xs in parent1 for x in xs]
+    par2 = [x for xs in parent2 for x in xs]
 
-    # Computing indexes for the crossover of each window
-    crx_index1 = random.randint(0,len(individuals[min_ch])-len(max([win1,win2],key=len)))
-    crx_index2 = random.randint(crx_index1, len(individuals[max_ch])-len(win2))
+    size = len(par1)
 
-    # Swap content of the windows with the second chromosome
-    individuals[min_ch][0:split_index],  individuals[max_ch][crx_index1:(len(win1)+crx_index1)] = individuals[max_ch][crx_index1:(len(win1)+crx_index1)], individuals[min_ch][0:split_index]
-    individuals[min_ch][split_index:],  individuals[max_ch][crx_index2:(len(win2)+crx_index2)] = individuals[max_ch][crx_index2:(len(win2)+crx_index2)], individuals[min_ch][split_index:] 
+    # Choose two random crossover points
+    cxpoint1, cxpoint2 = sorted(random.sample(range(size), 2))
 
-    return individuals
-
-def RecombIntegers(parent1, parent2, window_size, nb_passengers):
-
-    # TODO: see if it does make sense to do a check on the window's size
-
+    # Initialize child with zeros
+    child_flat = [0] * size
     
-
-    # Pick from parent1 a random set of passenger_id
-    passengers_cx = random.sample(list(range(1, nb_passengers+1)),window_size)
-
-    # Iterate over the transfer in the individual
-    # for transfer in range (1,len(parent2)):
-    #     # TODO: search for second solution in each transfer if the choices are present
-    #     parent2[transfer].index()
-    transfer_dims = [len(parent2[i]) for i in range(len(parent2))]
-    flattened_list = [x for xs in parent2 for x in xs]
-
-    # Check on the zero value
-
-
-    idx_passenger_in_transfer = [flattened_list.index(i) for i in passengers_cx] 
+    # Copy a slice from the first parent
+    child_flat[cxpoint1:cxpoint2] = par1[cxpoint1:cxpoint2]
     
+    # Create a list of the remaining elements from the second parent
+    remaining_elements = [item for item in par2 if item not in child_flat]
+    
+    # Fill some remaining slots with the remaining elements from the second parent
+    current_index = 0
+    i = 0
+    while i < (size) and current_index < len(remaining_elements):
+        # Maybe we can add a probability check here
+        if random.uniform(0.0,1.0) > 0.5:
+            if child_flat[i] == 0:
+                child_flat[i] = remaining_elements[current_index]
+                current_index += 1
+        else:
+            if child_flat[size-1-i] == 0:
+                child_flat[size-1-i] = remaining_elements[current_index]
+                current_index += 1
+        i += 1
 
-
+    # Reconstruct list of lists for child
+    child = []
+    start_index = 0
+    for length in dims:
+        sublist = child_flat[start_index:start_index + length]
+        child.append(sublist)
+        start_index += length
 
     return child
     
