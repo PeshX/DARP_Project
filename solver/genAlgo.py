@@ -64,25 +64,12 @@ def compute_mean_fitness(individuals, fitness, graph):
 
 # MUTATION
 
-def IntegerRandMutation(chromosome, individual, p, passengers_list):
-    # Filter passenger list to avoid generating the id of a passenger already present in the chromosome
-    filtered_list = [passenger_id for passenger_id in passengers_list if passenger_id not in chromosome]
-    # Append '0' means that a specific passenger can be excluded from that specific chromosome
-    filtered_list.append(0)
-    print(filtered_list)
-    # Iterate over all chromosome to randomly mutate its entries
-    for i in range(0,len(chromosome)-1):
-        if p > random.uniform(0.0,1.0):
-            chromosome[i] = random.choice(filtered_list)
-
-    return chromosome
-
-def MutationCustomDARPT(child, p, num_transfers):
+def MutationCustomDARPT(child, p):
         # Overcoming probability of mutation
         if p > random.uniform(0.0,1.0):
             # Randomly choose a transfer to be mutated
-            idMutatedTransfer = random.randint(0,num_transfers-1)
-            # Apply custom mutation to the selected transfer -> shuffle the passengers
+            idMutatedTransfer = random.randint(0,len(child)-1)
+            # Apply custom mutation to the selected transfer -> shuffle the passengers in it
             random.shuffle(child[idMutatedTransfer])
 
         return child
@@ -98,6 +85,7 @@ def CrossoverCustomDARPT(parent1, parent2):
     par1 = [x for xs in parent1 for x in xs]
     par2 = [x for xs in parent2 for x in xs]
 
+    # Pick the size of the flattened list
     size = len(par1)
 
     # Choose two random crossover points
@@ -112,16 +100,18 @@ def CrossoverCustomDARPT(parent1, parent2):
     # Create a list of the remaining elements from the second parent
     remaining_elements = [item for item in par2 if item not in child_flat]
     
-    # Fill some remaining slots with the remaining elements from the second parent
+    # Fill remaining slots with the remaining elements from the second parent
     current_index = 0
     i = 0
     while i < (size) and current_index < len(remaining_elements):
-        # Maybe we can add a probability check here
-        if random.uniform(0.0,1.0) > 0.5:
+        # Add random check for filling the list
+        if random.uniform(0.0,1.0) > 0.5: # Fill starting from the beginning
+            # Fill only if the i-th element is a zero
             if child_flat[i] == 0:
                 child_flat[i] = remaining_elements[current_index]
                 current_index += 1
-        else:
+        else: # Fill starting from the end
+            # Fill only if the i-th element is a zero
             if child_flat[size-1-i] == 0:
                 child_flat[size-1-i] = remaining_elements[current_index]
                 current_index += 1
