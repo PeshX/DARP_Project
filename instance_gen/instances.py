@@ -2,13 +2,13 @@
 import networkx as nx
 import random
 
-def createPassengersTransfersBatch(nb_passengers, nb_transfer ):
+def createPassengersTransfersBatch(nb_passengers, nb_transfer):
 
     # Create empty dictionary for transfers and passengers
     looUpTableTransfers = {}
     looUpTablePassengers = {}
 
-    # Compute worst case scenario for number of nodes
+    # Compute worst case scenario for number of nodes | Maybe we should think if we want to pass the list of nodes from outside?
     worst_case_nodes = nb_passengers*2 + nb_transfer*2
 
     # Create start/stop positions for transfers (need to be unique and not usable by passengers)
@@ -25,12 +25,17 @@ def createPassengersTransfersBatch(nb_passengers, nb_transfer ):
 
     for i in range(nb_passengers):
         key = i+1
-        start_position = random.randint(0, 100)  
-        stop_position = random.randint(start_position, 200)  
-        time_request = random.uniform(0.1, 10.0)  
-        passengers[key] = (start_position, stop_position, time_request)
+        start_position, stop_position = random.sample(range(worst_case_nodes), 2)
 
-    return passengers
+        # Check that start and stop positions are different
+        while stop_position==start_position:
+              stop_position = random.sample(range(worst_case_nodes), 2)
+
+        # time_request in minutes
+        time_request = random.randint(1,60)  
+        looUpTablePassengers[key] = (start_position, stop_position, time_request)
+
+    return looUpTableTransfers, looUpTablePassengers
 
 def createGraphInstance(num_nodes, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, min_degree):
 
