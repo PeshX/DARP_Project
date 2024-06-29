@@ -14,11 +14,11 @@ G = nx.DiGraph()
 
 # Define a function that retrieves the list of nodes which are involved per each transfer
 
-def TransferNodesSequence(transfer_LUT, passenger_LUT, transfer_id, transfer_i_list):
+def TransferNodesSequence(transfer_LUT, passenger_LUT, transfer_id, passengers_in_transfer):
          
       Nodes_List = []
       Nodes_List.append(transfer_LUT[transfer_id])
-      Nodes_List.append(passenger_LUT[i][0:2] for i in transfer_i_list) # passenger_LUT[i][0:2] Takes only the nodes for each passenger in the transfer
+      Nodes_List.append(passenger_LUT[i][0:2] for i in passengers_in_transfer) # passenger_LUT[i][0:2] Takes only the nodes for each passenger in the transfer
 
       return Nodes_List
 
