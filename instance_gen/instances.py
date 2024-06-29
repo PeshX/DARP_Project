@@ -17,7 +17,6 @@ def createPassengersTransfersBatch(nb_passengers, nb_transfer):
     # List of actual nodes for the graph
     Nodes_List = []
     Nodes_List.extend(transfer_points)
-    print(Nodes_List)
 
     # Fill each passenger with the characterizing parameters
     for i in range(nb_passengers):
@@ -39,7 +38,6 @@ def createPassengersTransfersBatch(nb_passengers, nb_transfer):
         
     # Cut out duplicates
     Nodes = list(set(Nodes_List))
-    print(Nodes_List)
 
     return looUpTableTransfers, looUpTablePassengers, Nodes
 
@@ -51,20 +49,13 @@ def createGraphInstance(nodes_list, min_weight_fuel, max_weight_fuel, min_weight
     G = nx.Graph()
     
     # Add starting set: 3 nodes connected by 3 edges
-    node1, node2, node3   = random.sample(nodes_list,3)
+    node1, node2, node3 = random.sample(nodes_list,3)
     G.add_node(node1)
     G.add_node(node2)
-    G.add_node(node2)
+    G.add_node(node3)
     G.add_edge(node1, node2, fuel_cost=3, time_cost=45)
     G.add_edge(node1, node3, fuel_cost=2, time_cost=30)
     G.add_edge(node2, node3, fuel_cost=4, time_cost=54)
-
-    # Find the indexes of the numbers to remove
-    indexes = [nodes_list.index(x) for x in [node1, node2, node3]]
-
-    # Note: Pop from the end of the list to avoid index shifting
-    for index in sorted(indexes, reverse=True):
-        nodes_list.pop(index)
 
     # Add remaining nodes with following construction
     for i in range(len(nodes_list)):
