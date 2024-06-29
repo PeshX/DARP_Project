@@ -2,30 +2,35 @@
 import networkx as nx
 import random
 
-def createPassengersBatch(nb_passengers):
+def createPassengersTransfersBatch(nb_passengers, nb_transfer ):
 
-    # Create empty dictionary
-    passengers = {}
+    # Create empty dictionary for transfers and passengers
+    looUpTableTransfers = {}
+    looUpTablePassengers = {}
+
+    # Compute worst case scenario for number of nodes
+    worst_case_nodes = nb_passengers*2 + nb_transfer*2
+
+    # Create start/stop positions for transfers (need to be unique and not usable by passengers)
+    transfer_points = random.sample(range(worst_case_nodes), nb_transfer*2)
+
+    # Assign positions to each transfer
+    for i in range(nb_transfer):
+        key = i+1
+        start_position = transfer_points.pop(0)
+        stop_position = transfer_points.pop(0)  
+        looUpTableTransfers[key] = (start_position, stop_position)
 
     # Fill each passenger with the characterizing parameters
 
-    # TODO: It can be done as a random.sample to guarantee a different starting and ending
-    # position, is it really necessary or there can be also shared positions?
-    # In addition, the for with .sample is not needed. We also have to do tranfers and
-    # passengers together, in the case that the are unique positions? 
-
     for i in range(nb_passengers):
-        key = f'passenger_{i+1}'
+        key = i+1
         start_position = random.randint(0, 100)  
         stop_position = random.randint(start_position, 200)  
         time_request = random.uniform(0.1, 10.0)  
         passengers[key] = (start_position, stop_position, time_request)
 
     return passengers
-
-# def createTransfers():
-
-#     return transfers
 
 def createGraphInstance(num_nodes, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, min_degree):
 
