@@ -7,8 +7,8 @@ from solver import *
 import matplotlib.pyplot as plt
 
 # ALGORITHM PARAMETERS 
-N = 10 #nb of individuals in the initial population
-nb_generations = 100
+N = 20 #nb of individuals in the initial population
+nb_generations = 500
 proba_mutation = 0.2 #proba for an ind to be muted 
 proba_mutation_gene = 0.3 #proba for a gene to be muted 
 proba_crossing = 0.4
@@ -26,14 +26,6 @@ min_weight_time, max_weight_time = 20,100
 min_degree = 2
 
 G = createGraphInstance(num_nodes, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, min_degree)
-
-# TEST 
-T1 = [1, 3, 5]
-T2 = [4, 2]
-individual = [T1, T2]
-#res = fitness(individual, G)
-#print("fitness of individual:", res)
-
 
 initial_pop =  generate_initial_pop(N, nb_passengers, vehicles_capacities)
 
@@ -76,8 +68,9 @@ X = 5
 mean_of_fitness_whole_pop_from_each_gen = []
 
 # 3 - RUNNING THE ALGORITHM 
-while (nb_iterations <= nb_generations): 
-    child_population = generate_next_generation(parent_population, fitness, N, selection, G)
+while (nb_iterations <= nb_generations):     
+
+    child_population = generate_next_generation(parent_population=parent_population, fitness=fitness, nb_individuals=N, selection_process=selection, proba_mutation=proba_mutation, graph=G)
     parent_population = child_population 
     nb_iterations += 1
 
@@ -85,8 +78,12 @@ while (nb_iterations <= nb_generations):
 
     # KPI1 : Fitness of the best individual of each generation 
     sorted_child_population = sorted(child_population, key=lambda ind: fitness(ind, G))
-    best_ind_from_child_pop = sorted_child_population[0]
-    best_fitness = fitness(best_ind_from_child_pop,G) 
+    test = [fitness(ind, G) for ind in sorted_child_population]
+    #print(test)
+    #best_ind_from_child_pop = sorted_child_population[0]
+    #best_fitness = fitness(best_ind_from_child_pop,G) 
+    first_non_zero = next((value for value in test if value != 0), None)
+    best_fitness = first_non_zero
     best_fitness_from_each_gen.append(best_fitness)
 
     # KPI2 : Fitness of the first X individuals of each generation for the mean 
@@ -126,9 +123,9 @@ plt.show()
 
 # PLOT 4 : all 3 curves 
 plt.figure(figsize=(10,8))
-plt.plot(generation_indices, best_fitness_from_each_gen, 'b', label="Evolution of the best fitness")
-plt.plot(generation_indices, mean_fitness_first_X_ind_from_each_gen, 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
-plt.plot(generation_indices, mean_of_fitness_whole_pop_from_each_gen, 'g', label="Evolution of the mean fitness of the whole population")
+plt.plot(generation_indices[::50], best_fitness_from_each_gen[::50], 'b', label="Evolution of the best fitness")
+plt.plot(generation_indices[::50], mean_fitness_first_X_ind_from_each_gen[::50], 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
+plt.plot(generation_indices[::50], mean_of_fitness_whole_pop_from_each_gen[::50], 'g', label="Evolution of the mean fitness of the whole population")
 plt.xlabel('Génération')
 plt.title(f"Evolution des fitness au cours des {nb_generations} générations pour une population de {N} individus")
 plt.legend()

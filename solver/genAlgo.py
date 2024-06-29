@@ -16,6 +16,9 @@ def fitness(individual, graph) :
     overall_delay = 0
 
     for transfer in individual : 
+
+        transfer = [value for value in transfer if value != 0] #delete the zeros bc they don't correspond to any passenger
+
         consumption = 0
         delay = 0
 
@@ -223,7 +226,8 @@ def generate_next_generation(parent_population, fitness, nb_individuals, selecti
     """
     children_pop = []
 
-    for i in range(nb_individuals-1): 
+    for i in range(nb_individuals): 
+        #print("i", i)
 
         # 1 : SELECTION 
 
@@ -248,10 +252,14 @@ def generate_next_generation(parent_population, fitness, nb_individuals, selecti
 
         # 3 : MUTATION
         child_mutated = MutationCustomDARPT(child, proba_mutation)
+
+        children_pop.append(child_mutated)
         
     # add the best solution from the past generation 
     sorted_parent_population = sorted(parent_population, key=lambda ind: fitness(ind, graph))
     best_parent = sorted_parent_population[0]
+    #print("len:", len(children_pop))
+    #print(nb_individuals-1)
     children_pop[nb_individuals-1] = best_parent
 
     return children_pop
