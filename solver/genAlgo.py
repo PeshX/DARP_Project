@@ -17,14 +17,15 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
         # Retrieve the overall path of the transfer
         transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
 
-        chromosome_cost = compute_costs_transfer(transfer_path), graph
-        # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
+        chromosome_cost = compute_costs_transfer(transfer_path, graph)
 
+        # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
+        penalty_cost = compute_penalty_transfer(transfer_path, graph, chromosome, passenger_LUT)
 
         # Sum up to the individual fitness
-        #individual_fitness += chromosome_cost
+        individual_fitness += chromosome_cost - penalty_cost
 
-    return transfer_path
+    return individual_fitness
 
 def compute_costs_transfer(transfer_path, graph): 
     # Given the overall path of the transfer, we compute its cost (fuel + time)
@@ -58,6 +59,63 @@ def filter_transfer(transfer_path):
 
     return filtered_transfer 
 
+def compute_penalty_transfer(transfer_path, graph, chromosome, passengers_dict): 
+
+    total_penalty = 0
+
+    filtered_transfer = filter_transfer2(transfer_path) #list of sublists for each passenger 
+    transfer_path = filtered_transfer
+
+    passengers_in_chromosome = [i for i in chromosome if i != 0] #cleaning the zeros 
+    cpt = 0
+
+    for passenger_path in transfer_path : 
+        penalty_cost = 0
+        passenger_index = passengers_in_chromosome[cpt]
+
+        for s in range(len(passenger_path)-1) : 
+            stop1 = passenger_path[s]
+            stop2 = passenger_path[s+1]
+
+            edge_data = graph.get_edge_data(stop1, stop2) # fetch the weights from the graph for the edge (stop1, stop2)
+
+            time = edge_data['time_cost']
+            
+        time_request = passengers_dict[passenger_index][2]
+
+        penalty_cost = time - time_request
+        total_penalty += penalty_cost
+
+        cpt+=1
+
+    return total_penalty
+
+def filter_transfer2(transfer_path):
+    
+    input_list = input_list[1:]
+
+    try:
+        last_eop_index = len(input_list) - 1 - input_list[::-1].index('EOP')
+    except ValueError:
+        # EOP NOT FOUND, I just return the list without the first element 
+        return []
+
+    list_before_last_eop = input_list[:last_eop_index] #get the list before the last 'EOP'
+
+    # splitting the list before the last EOP 
+    result = []
+    temp_list = []
+    for i in list_before_last_eop:
+        if i == 'EOP':
+            if temp_list:
+                result.append(temp_list)
+            temp_list = []
+        else:
+            temp_list.append(i)
+    if temp_list:
+        result.append(temp_list)
+
+    return result
 
 
 def fitness(individual, graph) : 
