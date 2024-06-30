@@ -3,11 +3,8 @@
 import random 
 
 """
- TO GENERATE THE INITIAL POPULATION (POOL OF SOLUTIONS)
- Strategy : first, we'll generate individuals at random 
-            then, we check if each individuals is a valid solution 
-            if not, we make small changes until it is valid 
-    All we want is a good enough population to start with, the genetic algorithm will do the rest improving them 
+ GENERATION OF THE INITIAL POPULATION (POOL OF SOLUTIONS)
+ 
 """
 
 def generate_individual_at_random(nb_passengers, capacities) : 
@@ -17,16 +14,35 @@ def generate_individual_at_random(nb_passengers, capacities) :
     @param nb_passengers := nb of customers to drive 
     
     """
-    ind = generate_random_lists(nb_passengers, capacities)
+    #ind = generate_random_lists(nb_passengers, capacities)
+    ind = distribute_passengers(nb_passengers, capacities)
 
     return ind
 
-def is_valid(solution): 
-    # checks if a solution is valid with respect to the constraints 
 
-    # C1 : capacity of each vehicle respected 
+def distribute_passengers(num_passengers, capacities):
+    
+    passengers = list(range(1, num_passengers + 1))
+    random.shuffle(passengers)
+    
+    result = [[] for _ in capacities]
 
-    return True
+    for i, capacity in enumerate(capacities):
+        while len(result[i]) < capacity and passengers:
+            result[i].append(passengers.pop())
+    
+    while passengers:
+        for sublist in result:
+            if passengers:
+                sublist.append(passengers.pop())
+    
+    # Filling with zeros if some seats are free 
+    for sublist, capacity in zip(result, capacities):
+        while len(sublist) < capacity:
+            sublist.append(0)
+    
+    return result
+
 
 def generate_initial_pop(nb_individuals, nb_passengers, capacities): 
     # generates a pool of feasible solutions, the initial population to feed the algorithm with 
@@ -36,44 +52,14 @@ def generate_initial_pop(nb_individuals, nb_passengers, capacities):
     init_pop = []
     for i in range(nb_individuals): 
         ind = generate_individual_at_random(nb_passengers, capacities)
-
-        while (not is_valid(ind)) : 
-            # FIX IT 
-            i = 0
         init_pop.append(ind)
 
     return init_pop
 
 
 """
-    ANNEX FUNCTIONS
+ FOR PRETTY OUTPUTS 
 """
-
-def generate_random_lists(n, sizes):
-    # Check if the sum of sizes equals n
-    """if sum(sizes) != n:
-        raise ValueError("The sum of the sizes must equal n.")"""
-    
-    # Create a list of numbers from 1 to N
-    numbers = list(range(1, n + 1))
-    # Shuffle the list to randomize the order
-    random.shuffle(numbers)
-    
-    # Initialize an empty list to hold the sublists
-    main_list = []
-    
-    # Generate the sublists based on the sizes provided
-    for size in sizes:
-        # Extract the sublist from the shuffled numbers
-        sublist = numbers[:size]
-        # Append the sublist to the main list
-        main_list.append(sublist)
-        # Remove the used numbers from the list
-        numbers = numbers[size:]
-    
-    return main_list
-
-
 def pretty_solution(solution): 
     # to display a readable solution 
     L = ""
@@ -107,8 +93,10 @@ def pretty_population(pop):
     return L
 
 # TEST
-nb_passengers = 10 # total nb of customers 
-capacities = [3, 2, 5]  # capacities of all vehicles 
+nb_passengers = 1 # total nb of customers 
+#capacities = [3, 2, 5]  # capacities of all vehicles 
+capacities = [3, 2]
+
 
 test_one_sol = generate_individual_at_random(nb_passengers, capacities) 
 #print(test_one_sol)
@@ -116,3 +104,4 @@ print(pretty_solution(test_one_sol))
 
 test_one_pop = generate_initial_pop(5, nb_passengers, capacities)
 print(pretty_population(test_one_pop))
+print(test_one_pop)

@@ -20,8 +20,11 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
 
         break
 
-        # Compute the overall cost of the transfer
+        # Given the overall path of the transfer, we compute its cost (fuel + time)
         #chromosome_cost = 
+
+        # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
+
 
         # Sum up to the individual fitness
         #individual_fitness += chromosome_cost
