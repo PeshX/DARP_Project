@@ -95,7 +95,7 @@ def compute_penalty_transfer(transfer_path, graph, chromosome, passengers_dict):
 
 def filter_transfer2(transfer_path):
     
-    input_list = input_list[1:]
+    input_list = transfer_path[1:]
 
     try:
         last_eop_index = len(input_list) - 1 - input_list[::-1].index('EOP')
@@ -120,7 +120,7 @@ def filter_transfer2(transfer_path):
 
     return result
 
-def compute_mean_fitness(individuals, fitness, graph):
+def compute_mean_fitness(individuals, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t):
     """
     Computes the mean fitness of a list of individuals.
     
@@ -131,7 +131,7 @@ def compute_mean_fitness(individuals, fitness, graph):
     @return: the mean fitness of the individuals
     """
 
-    fitnesses = [fitness(ind, graph) for ind in individuals]
+    fitnesses = [Fitness(ind, graph, transfer_LUT, passenger_LUT, w_f, w_t) for ind in individuals]
     mean_fitness = np.mean(fitnesses)
     
     return mean_fitness
@@ -208,7 +208,7 @@ def CrossoverCustomDARPT(parent1, parent2):
 
 # 1 - ROULETTE WHEEL SELECTION 
 
-def roulette_wheel_selection(population, fitness, graph): 
+def roulette_wheel_selection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
     """
     @param population, a pool of individuals/solutions 
     @param fitness, the numeric function that evaluates the "goodness" of a solution 
@@ -224,7 +224,7 @@ def roulette_wheel_selection(population, fitness, graph):
     fitnesses = []
 
     for ind in population: 
-        fitnesses.append(fitness(ind, graph))
+        fitnesses.append(Fitness(ind, graph, transfer_LUT, passenger_LUT, w_f, w_t))
         #print("fitnesses list", fitnesses)
 
     sum_probabilities = 0
@@ -263,7 +263,7 @@ def roulette_wheel_selection(population, fitness, graph):
     
 # 2 - TOURNAMENT SELECTION 
 
-def tournament_selection(population, fitness, graph, tournament_size): 
+def tournament_selection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, tournament_size): 
 
     """
     @param population, a pool of individuals/solutions 
@@ -279,7 +279,7 @@ def tournament_selection(population, fitness, graph, tournament_size):
     for _ in range(population_size):
         tournament = random.sample(population, tournament_size) # random select of a sample individuals in the pop to participate in the tournament 
         
-        tournament_fitnesses = [fitness(ind, graph) for ind in tournament]
+        tournament_fitnesses = [Fitness(ind, graph, transfer_LUT, passenger_LUT, w_f, w_t) for ind in tournament]
         
         best_individual = tournament[tournament_fitnesses.index(max(tournament_fitnesses))]
         
@@ -290,7 +290,7 @@ def tournament_selection(population, fitness, graph, tournament_size):
 
 
 # GENERATE NEXT GENERATION (CHILDREN OF SELECTED PARENTS)
-def generate_next_generation(parent_population, fitness, nb_individuals, selection_process, proba_mutation, graph): 
+def generate_next_generation(parent_population, Fitness, nb_individuals, selection_process, proba_mutation, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
     """
     Combining all processes, it generates a new population from a parent one (through crossover, mutation, selection)
     It will be called at each iteration of the algorithm
@@ -303,16 +303,16 @@ def generate_next_generation(parent_population, fitness, nb_individuals, selecti
         # 1 : SELECTION 
 
         if selection_process == "roulette" : 
-            selected_individuals = roulette_wheel_selection(parent_population, fitness, graph)
+            selected_individuals = roulette_wheel_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t)
 
             while(len(selected_individuals) < 2) : 
-                selected_individuals = roulette_wheel_selection(parent_population, fitness, graph)
+                selected_individuals = roulette_wheel_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t)
 
         elif selection_process == "tournament" : 
-            selected_individuals = tournament_selection(parent_population, fitness, graph, 3)
+            selected_individuals = tournament_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, 3)
 
             while(len(selected_individuals) < 2) : 
-                selected_individuals = tournament_selection(parent_population, fitness, graph)
+                selected_individuals = tournament_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, 3)
 
         random_picked_parents = random.sample(selected_individuals, 2)
         parent1 = random_picked_parents[0]
@@ -327,10 +327,8 @@ def generate_next_generation(parent_population, fitness, nb_individuals, selecti
         children_pop.append(child_mutated)
         
     # add the best solution from the past generation 
-    sorted_parent_population = sorted(parent_population, key=lambda ind: fitness(ind, graph))
+    sorted_parent_population = sorted(parent_population, key=lambda ind: Fitness(ind, graph, transfer_LUT, passenger_LUT, w_f, w_t))
     best_parent = sorted_parent_population[0]
-    #print("len:", len(children_pop))
-    #print(nb_individuals-1)
     children_pop[nb_individuals-1] = best_parent
 
     return children_pop

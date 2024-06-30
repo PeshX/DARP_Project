@@ -27,8 +27,8 @@ initial_pop = generate_initial_pop(N, len(Passenger), vehicles_capacities)
 
 # SELECTION PROCESS 
 
-selected_individuals_by_roulette = roulette_wheel_selection(initial_pop, Fitness, G) 
-selected_individuals_by_tournament = tournament_selection(initial_pop, Fitness, G, 3)
+selected_individuals_by_roulette = roulette_wheel_selection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t) 
+selected_individuals_by_tournament = tournament_selection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t, 3)
 
 print("WITH ROULETTE SELECTION, THE SELECTIONED INDIVIDUALS ARE:")
 for ind in selected_individuals_by_roulette: 
@@ -42,8 +42,8 @@ for ind in selected_individuals_by_tournament:
 To compare both approach, we can compare mean of fitnesses of the selected individuals  
 The bigger the sum is, the worst are the individual, that's a first metric
 """
-mean_fitness_roulette = compute_mean_fitness(selected_individuals_by_roulette, Fitness, G)
-mean_fitness_tournament = compute_mean_fitness(selected_individuals_by_tournament, Fitness, G)
+mean_fitness_roulette = compute_mean_fitness(selected_individuals_by_roulette, Fitness, G, Transfer, Passenger, w_f, w_t)
+mean_fitness_tournament = compute_mean_fitness(selected_individuals_by_tournament, Fitness, G, Transfer, Passenger, w_f, w_t)
 
 print("mean fitness roulette: ", mean_fitness_roulette)
 print("mean fitness tournament: ", mean_fitness_tournament)
@@ -66,15 +66,15 @@ mean_of_fitness_whole_pop_from_each_gen = []
 # 3 - RUNNING THE ALGORITHM 
 while (nb_iterations <= nb_generations):     
 
-    child_population = generate_next_generation(parent_population=parent_population, fitness=Fitness, nb_individuals=N, selection_process=selection, proba_mutation=proba_mutation, graph=G)
+    child_population = generate_next_generation(parent_population, Fitness, N, selection, proba_mutation, G, Transfer, Passenger, w_f, w_t)
     parent_population = child_population 
     nb_iterations += 1
 
     # FETCHING DATA FOR PERFORMANCE MEASUREMENTS 
 
     # KPI1 : Fitness of the best individual of each generation 
-    sorted_child_population = sorted(child_population, key=lambda ind: Fitness(ind, G))
-    test = [Fitness(ind, G) for ind in sorted_child_population]
+    sorted_child_population = sorted(child_population, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
+    test = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in sorted_child_population]
     #print(test)
     #best_ind_from_child_pop = sorted_child_population[0]
     #best_fitness = fitness(best_ind_from_child_pop,G) 
@@ -84,12 +84,12 @@ while (nb_iterations <= nb_generations):
 
     # KPI2 : Fitness of the first X individuals of each generation for the mean 
     top_individuals = sorted_child_population[:X]
-    top_fitnesses = [Fitness(ind, G) for ind in top_individuals]
+    top_fitnesses = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in top_individuals]
     mean_of_the_fitness_of_first_X_individuals = np.mean(top_fitnesses)
     mean_fitness_first_X_ind_from_each_gen.append(mean_of_the_fitness_of_first_X_individuals)
 
     # KPI3 : Fitness of all individuals of each generation 
-    fitnesses_of_whole_gen = [Fitness(ind, G) for ind in child_population]
+    fitnesses_of_whole_gen = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in child_population]
     mean_fitness_of_whole_pop = np.mean(fitnesses_of_whole_gen)
     mean_of_fitness_whole_pop_from_each_gen.append(mean_fitness_of_whole_pop)
 
@@ -128,30 +128,20 @@ plt.legend()
 plt.show()
 
 
+# PLOT 5 : graph of the scenario 
 
-# print(Fitness([[1,2,0], [0,0,0], [0,0]], G, Transfer, Passenger, w_f, w_t))
+# Position the nodes using a layout
+pos = nx.spring_layout(G)
 
-# # Find the shortest path using the combined weight function
+# Draw the graph
+plt.figure()
+nx.draw_networkx(G, pos, with_labels=True, node_size=700, node_color='lightblue', font_size=10, font_weight='bold')
 
-# source = Nodes[1]
-# target = Nodes[4]
-# path = nx.dijkstra_path(G, source=source, target=target, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t))
-# path_length = nx.dijkstra_path_length(G, source=source, target=target, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)) 
+# Prepare edge labels with both weights
+edge_labels = {(u, v): f'({d["fuel_cost"]}, {d["time_cost"]})' for u, v, d in G.edges(data=True)}
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-# print(f"Path from node {source} to node {target} is: {path}")
-
-# # Position the nodes using a layout
-# pos = nx.spring_layout(G)
-
-# # Draw the graph
-# plt.figure()
-# nx.draw_networkx(G, pos, with_labels=True, node_size=700, node_color='lightblue', font_size=10, font_weight='bold')
-
-# # Prepare edge labels with both weights
-# edge_labels = {(u, v): f'({d["fuel_cost"]}, {d["time_cost"]})' for u, v, d in G.edges(data=True)}
-# nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-
-# # Display the plot with informative box
-# plt.title('Graph of the current scenario')
-# plt.show()
+# Display the plot with informative box
+plt.title('Graph of the current scenario')
+plt.show()
 
