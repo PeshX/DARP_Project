@@ -17,12 +17,7 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
         # Retrieve the overall path of the transfer
         transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
 
-
-        break
-
-        # Given the overall path of the transfer, we compute its cost (fuel + time)
-        #chromosome_cost = 
-
+        chromosome_cost = compute_costs_transfer(transfer_path), graph
         # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
 
 
@@ -30,6 +25,39 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
         #individual_fitness += chromosome_cost
 
     return transfer_path
+
+def compute_costs_transfer(transfer_path, graph): 
+    # Given the overall path of the transfer, we compute its cost (fuel + time)
+    total_cost = 0
+
+    filtered_transfer_path = filter_transfer(transfer_path) 
+    transfer = filtered_transfer_path
+
+    for s in range(len(transfer)-1) : 
+        stop1 = transfer[s]
+        stop2 = transfer[s+1]
+
+        edge_data = graph.get_edge_data(stop1, stop2) # fetch the weights from the graph for the edge (stop1, stop2)
+
+        fuel, time = edge_data['fuel_cost'], edge_data['time_cost']
+        
+        total_cost += fuel + time 
+    return total_cost
+
+    return 0 
+
+def filter_transfer(transfer_path): 
+    filtered_transfer = []
+    i = 0 
+    while i < len(transfer_path): 
+        if transfer_path[i] == 'EOP': 
+            i+=2 
+        else: 
+            filtered_transfer.append(transfer_path[i])
+            i+=1 
+
+    return filtered_transfer 
+
 
 
 def fitness(individual, graph) : 
