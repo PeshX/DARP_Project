@@ -23,7 +23,10 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
         penalty_cost = compute_penalty_transfer(transfer_path, graph, chromosome, passenger_LUT)
 
         # Sum up to the individual fitness
-        individual_fitness += chromosome_cost - penalty_cost
+        individual_fitness += chromosome_cost + penalty_cost
+
+        # Increase transfer number according to index of chromosome + 1
+        n_transfer += 1
 
     return individual_fitness
 
@@ -116,53 +119,6 @@ def filter_transfer2(transfer_path):
         result.append(temp_list)
 
     return result
-
-
-def fitness(individual, graph) : 
-    """
-    @param individual := a solution, id est a list of lists of integers (list of transfers)
-
-    return an integer value : the better the solution, the lower the value 
-    the integer value considers the consumption of the vehicle (fuel) and the bad quality of service (delays)
-
-    """
-    res = 0
-    overall_consumption = 0
-    overall_delay = 0
-
-    for transfer in individual : 
-
-        transfer = [value for value in transfer if value != 0] #delete the zeros bc they don't correspond to any passenger
-
-        consumption = 0
-        delay = 0
-
-        # each transfer is an ordered list of integers : the passengers fetched by the vehicle 
-        weights = []
-
-        for stop in range(len(transfer)-1) : 
-            passenger1 = transfer[stop]
-            passenger2 = transfer[stop+1]
-
-            edge_data = graph.get_edge_data(passenger1, passenger2) # fetch the weights from the graph for the edge (passenger1, passenger2)
-            weights.append(edge_data)
-
-        #print("weights =", weights)
-        for w in weights : 
-             if w != None : 
-                #print("w=", w)
-                #print("fuel cost", w['fuel_cost'])
-
-           
-                consumption += w['fuel_cost'] # up the consumption accordingly to the weight 
-                delay += w['time_cost'] # up the delay accordingly to the weight 
-        
-        overall_consumption += consumption
-        overall_delay += delay 
-    
-        res = overall_consumption + overall_delay
-    return res 
-
 
 def compute_mean_fitness(individuals, fitness, graph):
     """
