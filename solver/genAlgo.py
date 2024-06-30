@@ -1,7 +1,33 @@
 import random
 import numpy as np
+from .routing import RoutingAlgorithm
 
 # FITNESS FUNCTION 
+
+def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
+
+    # Define fitness of the individual 
+    individual_fitness = 0
+
+    n_transfer = 1 # Transfer ID
+
+    # Iterate over the chromosomes (transfers) in the individual
+    for chromosome in individual:
+
+        # Retrieve the overall path of the transfer
+        transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
+
+
+        break
+
+        # Compute the overall cost of the transfer
+        #chromosome_cost = 
+
+        # Sum up to the individual fitness
+        #individual_fitness += chromosome_cost
+
+    return transfer_path
+
 
 def fitness(individual, graph) : 
     """
