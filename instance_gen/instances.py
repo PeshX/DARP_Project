@@ -24,7 +24,7 @@ def createPassengersTransfersBatch(nb_passengers, nb_transfer):
         start_position, stop_position = random.sample([x for x in range(worst_case_nodes) if x not in transfer_points], 2)
 
         # Time_request in minutes
-        time_request = random.randint(1,60) # TODO: this has to go accoridng to the time weights on the graph 
+        time_request = random.randint(60,300) # TODO: this has to go according to the time weights on the graph 
         looUpTablePassengers[key] = (start_position, stop_position, time_request)
         # Append new nodes
         Nodes_List.extend([start_position, stop_position])
@@ -33,8 +33,9 @@ def createPassengersTransfersBatch(nb_passengers, nb_transfer):
     for i in range(nb_transfer):
         key = i+1
         start_position = transfer_points.pop(0)
-        stop_position = transfer_points.pop(0)  
-        looUpTableTransfers[key] = (start_position, stop_position)
+        stop_position = transfer_points.pop(0) 
+        capacity = random.randint(5,10) # TODO: this can be changed according to the number of passengers or viceversa
+        looUpTableTransfers[key] = (start_position, stop_position, capacity)
         
     # Cut out duplicates
     Nodes = list(set(Nodes_List))
