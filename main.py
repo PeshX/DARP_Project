@@ -137,14 +137,14 @@ Transfer, Passenger, Nodes = createPassengersTransfersBatch(2,2)
 
 print(TransferNodesSequence(Transfer, Passenger, 1, [1,2,0]))
 
-
-
-# # Create graph according to user
-# G = createGraphInstance(Nodes,1,10,20,100,2)
-
 # # Set weights for fuel cost and time cost
-# w_f = 0.4  # Weight for fuel cost
-# w_t = 0.6  # Weight for time cost
+w_f = 0.4  # Weight for fuel cost
+w_t = 0.6  # Weight for time cost
+
+# Create graph according to user
+G = createGraphInstance(Nodes,1,10,20,100,2)
+
+print(Fitness([[1,2,0], [0,0,0], [0,0]], G, Transfer, Passenger, w_f, w_t))
 
 # # Find the shortest path using the combined weight function
 
@@ -155,18 +155,18 @@ print(TransferNodesSequence(Transfer, Passenger, 1, [1,2,0]))
 
 # print(f"Path from node {source} to node {target} is: {path}")
 
-# # Position the nodes using a layout
-# pos = nx.spring_layout(G)
+# Position the nodes using a layout
+pos = nx.spring_layout(G)
 
-# # Draw the graph
-# plt.figure()
-# nx.draw_networkx(G, pos, with_labels=True, node_size=700, node_color='lightblue', font_size=10, font_weight='bold')
+# Draw the graph
+plt.figure()
+nx.draw_networkx(G, pos, with_labels=True, node_size=700, node_color='lightblue', font_size=10, font_weight='bold')
 
-# # Prepare edge labels with both weights
-# edge_labels = {(u, v): f'({d["fuel_cost"]}, {d["time_cost"]})' for u, v, d in G.edges(data=True)}
-# nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+# Prepare edge labels with both weights
+edge_labels = {(u, v): f'({d["fuel_cost"]}, {d["time_cost"]})' for u, v, d in G.edges(data=True)}
+nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
-# # Display the plot with informative box
-# plt.title('Graph of the current scenario')
-# plt.show()
+# Display the plot with informative box
+plt.title('Graph of the current scenario')
+plt.show()
 
