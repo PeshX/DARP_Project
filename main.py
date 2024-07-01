@@ -21,6 +21,13 @@ Transfer, Passenger, Nodes = createPassengersTransfersBatch(20,4)
 # Create graph according to user
 G = createGraphInstance(Nodes,1,10,20,100,2)
 
+ind_test = [[1,2,0,0,5,7],[0,0,0],[0,0,0,0]]
+test_path = Fitness(ind_test,G,Transfer,Passenger,w_f,w_t)
+print(test_path)
+T_path, PSG_path = test_tPath(test_path)
+print(T_path)
+print(PSG_path)
+
 vehicles_capacities = [Transfer[transfer][2] for transfer in Transfer]  
 
 # Generate initial population

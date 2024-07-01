@@ -70,6 +70,7 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
      I_cn, I_p = 1,1
 
      transfer_path.extend(nx.dijkstra_path(graph, source = starting_node, target= nodes_list[I_cn][0], weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
+     transfer_path.insert(-1,'SOP')
      transfer_path.pop()
 
      current_node = nodes_list[I_cn][0]
@@ -99,6 +100,7 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
                         
                 else:
                                                        
+                    transfer_path.append('SOP')
                     transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= next_p, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
                     transfer_path.pop()
                     current_node = next_p
@@ -108,6 +110,7 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
                         
             elif (I_cn + 1) < len(nodes_list):
                 
+                transfer_path.append('SOP')
                 transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= next_p, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
                 transfer_path.pop()
                 I_p += 1

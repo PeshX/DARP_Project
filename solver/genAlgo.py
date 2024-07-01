@@ -34,7 +34,7 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
         else:
             # Retrieve the overall path of the transfer
             transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
-
+            break
             # Compute cost for the overall trasnfer path
             chromosome_cost = ComputeCostTransfer(transfer_path, graph)
 
@@ -47,7 +47,50 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
             # Increase transfer number according to index of chromosome + 1
             n_transfer += 1
 
-    return individual_fitness
+    return transfer_path
+
+
+def test_tPath(transfer_path):
+    
+    # Find the indices of 'SOP' and 'EOP' in the list
+    sop_indices = [index for index, value in enumerate(transfer_path) if value == 'SOP']
+    eop_indices = [index for index, value in enumerate(transfer_path) if value == 'EOP']
+
+    # Segments the list based on 'SOP' and 'EOP' indices
+    segmented_list = [transfer_path[sop_indices[i]+1:eop_indices[i]] for i in range(len(eop_indices))]
+
+    # Passenger path below
+
+    filtered_segmentation = []
+
+    for su_list in (segmented_list):
+        filtered_segmentation.extend([[elem for elem in (su_list) if (elem!='SOP' and elem!='EOP')]])
+        
+
+    true_filtered_segmentation=[]
+    for su_list in (filtered_segmentation):
+        
+        result=[su_list[0]]
+        for i in range(1, len(su_list)):
+                if su_list[i] != su_list[i - 1]:
+                    result.append(su_list[i])
+                    
+        true_filtered_segmentation.extend([result])
+        
+    # Transfer path below
+
+    # Indexes of EOP
+    k = [value for value in  range(len(transfer_path)) if transfer_path[value] =='EOP']
+
+    k.extend([value2-1 for value2 in k])
+
+    # Indexes of SOP
+    j = [value for value in  range(len(transfer_path)) if transfer_path[value] =='SOP']
+    k.extend(j)
+    transfer_path2 = [elem for i, elem in enumerate(transfer_path) if i not in k]
+
+
+    return transfer_path2, true_filtered_segmentation
 
 def ComputeCostTransfer(transfer_path, graph): 
 

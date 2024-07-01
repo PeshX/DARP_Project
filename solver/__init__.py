@@ -8,6 +8,7 @@ from .genAlgo import MutationCustomDARPT
 from .routing import TransferNodesSequence
 from .routing import RoutingAlgorithm
 from .routing import CombinedWeight
+from .genAlgo import test_tPath
 
 __all__ = [
     "Fitness",
@@ -19,5 +20,6 @@ __all__ = [
     "MutationCustomDARPT",
     "TransferNodesSequence",
     "RoutingAlgorithm",
-    "CombinedWeight"
+    "CombinedWeight",
+    'test_tPath'
 ]
