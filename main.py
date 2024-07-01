@@ -5,6 +5,7 @@ import networkx as nx
 from instance_gen import *
 from solver import *
 import matplotlib.pyplot as plt
+import os
 
 # ALGORITHM PARAMETERS 
 N = 20 #nb of individuals in the initial population
@@ -103,19 +104,22 @@ generation_indices = range(nb_generations+1)
 plt.plot(generation_indices, best_fitness_from_each_gen, label="Evolution of the best fitness of each generation")
 plt.xlabel('Generation')
 plt.ylabel('Best fitness')
-plt.show()
+figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'best_fitness.png')
+plt.savefig(figure_path)
 
 # PLOT 2 : evolution of the mean of the fitness of the X best individuals along the reproduction process 
 plt.plot(generation_indices, mean_fitness_first_X_ind_from_each_gen, label='Evolution of the mean of the fitness of the f"{X} first best individuals')
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of the f{X} best individuals of the generation')
-plt.show()
+figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_best_fitness.png')
+plt.savefig(figure_path)
 
 # PLOT 3 : evolution of the mean of the fitness of all individuals along the reproduction process 
 plt.plot(generation_indices, mean_of_fitness_whole_pop_from_each_gen, label="Evolution of the mean fitness of the whole population")
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of all individuals')
-plt.show()
+figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_fitness.png')
+plt.savefig(figure_path)
 
 # PLOT 4 : all 3 curves 
 plt.figure(figsize=(10,8))
@@ -125,7 +129,8 @@ plt.plot(generation_indices[::50], mean_of_fitness_whole_pop_from_each_gen[::50]
 plt.xlabel('Génération')
 plt.title(f"Evolution des fitness au cours des {nb_generations} générations pour une population de {N} individus")
 plt.legend()
-plt.show()
+figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'fitness_evolution.png')
+plt.savefig(figure_path)
 
 
 # PLOT 5 : graph of the scenario 
@@ -143,5 +148,6 @@ nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
 # Display the plot with informative box
 plt.title('Graph of the current scenario')
-plt.show()
+figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'graph.png')
+plt.savefig(figure_path)
 
