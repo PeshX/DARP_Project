@@ -1,40 +1,27 @@
+import os
 import numpy as np
-import gurobipy as gb
-import pygad as ga
-import networkx as nx
+import matplotlib.pyplot as plt
 from instance_gen import *
 from solver import *
-import matplotlib.pyplot as plt
-import os
 
-# ALGORITHM PARAMETERS 
-N = 20 #nb of individuals in the initial population
-nb_generations = 100
-proba_mutation = 0.4 #proba for an ind to be muted 
-# Set weights for fuel cost and time cost
-w_f = 0.4  # Weight for fuel cost
-w_t = 0.6  # Weight for time cost
+# Algorithm parameters 
+N = 20                      #nb of individuals in the initial population
+nb_generations = 100        # nb of new generations in the population
+proba_mutation = 0.4        #proba for an ind to be muted 
+w_f = 0.4                   # Weight for fuel cost
+w_t = 0.6                   # Weight for time cost
 
-# INSTANCE CREATION 
+# Instance creation
 Transfer, Passenger, Nodes = createPassengersTransfersBatch(20,4)
-
-# Create graph according to user
 G = createGraphInstance(Nodes,1,10,20,100,2)
 
-ind_test = [[1,2,0,0,5,7],[0,0,0],[0,0,0,0]]
-test_path = Fitness(ind_test,G,Transfer,Passenger,w_f,w_t)
-print(test_path)
-T_path, PSG_path = test_tPath(test_path)
-print(T_path)
-print(PSG_path)
-
+# Fetch transfers' capacities
 vehicles_capacities = [Transfer[transfer][2] for transfer in Transfer]  
 
 # Generate initial population
 initial_pop = generate_initial_pop(N, len(Passenger), vehicles_capacities)
 
-# SELECTION PROCESS 
-
+# Selection processes
 selected_individuals_by_roulette = RouletteWheelSelection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t) 
 selected_individuals_by_tournament = TournamentSelection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t, 3)
 print(selected_individuals_by_tournament)
@@ -60,22 +47,21 @@ print("mean fitness roulette: ", mean_fitness_roulette)
 print("mean fitness tournament: ", mean_fitness_tournament)
 """
 
-# GENETIC ALGORITHM 
+# GENETIC ALGORITHM -------------------------------------------------------------------------------------------------------------
 
-# 1 - INITIALIZATION 
+# 1 - Initialization 
 nb_iterations = 0 
 selection = "roulette" #tournament"
 initial_population = generate_initial_pop(nb_individuals=N, nb_passengers=len(Passenger), capacities=vehicles_capacities)
-
 parent_population = initial_population
 
-# 2 - PREPARE DATA FOR PERFORMANCE ANALYTICS 
+# 2 - Prepare data for performance analytics 
 best_fitness_from_each_gen = []
 mean_fitness_first_X_ind_from_each_gen = []
 X = 5
 mean_of_fitness_whole_pop_from_each_gen = []
 
-# 3 - RUNNING THE ALGORITHM 
+# 3 - Running the algorithm
 while (nb_iterations <= nb_generations):     
 
     child_population = GenerateNextGeneration(parent_population, Fitness, N, selection, proba_mutation, G, Transfer, Passenger, w_f, w_t)
@@ -83,7 +69,7 @@ while (nb_iterations <= nb_generations):
     parent_population = child_population 
     nb_iterations += 1
 
-    # FETCHING DATA FOR PERFORMANCE MEASUREMENTS 
+    # Fech data fro performance metrics
 
     # KPI1 : Fitness of the best individual of each generation 
     sorted_child_population = sorted(child_population, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
@@ -108,7 +94,7 @@ while (nb_iterations <= nb_generations):
     mean_of_fitness_whole_pop_from_each_gen.append(mean_fitness_of_whole_pop)
 
 
-# PLOTTING 
+# Plotting
 generation_indices = range(nb_generations+1)
 
 # NB : try with different selection processes 
@@ -162,22 +148,16 @@ plt.savefig(figure_path)
 plt.close()
 
 
-# PLOT 5 : graph of the scenario 
+# PLOT 5 : graph of the scenario (ONLY FOR SMALL INSTANCES FOR THE REPORT'S SAKE)
 
-# Position the nodes using a layout
-pos = nx.spring_layout(G)
-
-# Draw the graph
-plt.figure()
-nx.draw_networkx(G, pos, with_labels=True, node_size=700, node_color='lightblue', font_size=10, font_weight='bold')
-
-# Prepare edge labels with both weights
-edge_labels = {(u, v): f'({d["fuel_cost"]}, {d["time_cost"]})' for u, v, d in G.edges(data=True)}
-nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
-
-# Display the plot with informative box
-plt.title('Graph of the current scenario')
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'graph.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot5.png')
-plt.savefig(figure_path)
+# pos = nx.spring_layout(G)
+# plt.figure()
+# nx.draw_networkx(G, pos, with_labels=True, node_size=700, node_color='lightblue', font_size=10, font_weight='bold')
+# # Prepare edge labels with both weights
+# edge_labels = {(u, v): f'({d["fuel_cost"]}, {d["time_cost"]})' for u, v, d in G.edges(data=True)}
+# nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+# plt.title('Graph of the current scenario')
+# figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'graph.png')
+# figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot5.png')
+# plt.savefig(figure_path)
 

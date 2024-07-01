@@ -1,8 +1,6 @@
 import random
 import numpy as np
-from .routing import RoutingAlgorithm
-
-# FITNESS FUNCTION 
+from .routing import RoutingAlgorithm 
 
 def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
 
@@ -33,13 +31,16 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
             n_transfer += 1
         else:
             # Retrieve the overall path of the transfer
-            transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
-            break
+            overall_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
+            
+            # Obtain transfer path and passengers' paths
+            transfer_path, passenger_paths = PathTransferPassenger(overall_path)
+
             # Compute cost for the overall trasnfer path
             chromosome_cost = ComputeCostTransfer(transfer_path, graph)
 
             # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
-            penalty_cost = ComputePenaltyTransfer(transfer_path, graph, chromosome, passenger_LUT)
+            penalty_cost = ComputePenaltyTransfer(passenger_paths, graph, chromosome, passenger_LUT)
 
             # Sum up to the individual fitness
             individual_fitness += chromosome_cost + penalty_cost
@@ -47,17 +48,25 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
             # Increase transfer number according to index of chromosome + 1
             n_transfer += 1
 
-    return transfer_path
+    return individual_fitness
 
 
-def test_tPath(transfer_path):
+def PathTransferPassenger(overall_path):
+
+    """
+    Computes the transfer path and the passengers' paths for the fitness computation
+    
+    @param overall_path: general path given by the RoutingAlgorithm method
+    
+    @return: one list fro the transfer's path and a list of lists fro the partial paths of the passengers
+    """    
     
     # Find the indices of 'SOP' and 'EOP' in the list
-    sop_indices = [index for index, value in enumerate(transfer_path) if value == 'SOP']
-    eop_indices = [index for index, value in enumerate(transfer_path) if value == 'EOP']
+    sop_indices = [index for index, value in enumerate(overall_path) if value == 'SOP']
+    eop_indices = [index for index, value in enumerate(overall_path) if value == 'EOP']
 
     # Segments the list based on 'SOP' and 'EOP' indices
-    segmented_list = [transfer_path[sop_indices[i]+1:eop_indices[i]] for i in range(len(eop_indices))]
+    segmented_list = [overall_path[sop_indices[i]+1:eop_indices[i]] for i in range(len(eop_indices))]
 
     # Passenger path below
 
@@ -80,17 +89,18 @@ def test_tPath(transfer_path):
     # Transfer path below
 
     # Indexes of EOP
-    k = [value for value in  range(len(transfer_path)) if transfer_path[value] =='EOP']
+    k = [value for value in  range(len(overall_path)) if overall_path[value] =='EOP']
 
     k.extend([value2-1 for value2 in k])
 
     # Indexes of SOP
-    j = [value for value in  range(len(transfer_path)) if transfer_path[value] =='SOP']
+    j = [value for value in  range(len(overall_path)) if overall_path[value] =='SOP']
     k.extend(j)
-    transfer_path2 = [elem for i, elem in enumerate(transfer_path) if i not in k]
+    transfer_path = [elem for i, elem in enumerate(overall_path) if i not in k]
 
 
-    return transfer_path2, true_filtered_segmentation
+    return transfer_path, true_filtered_segmentation
+
 
 def ComputeCostTransfer(transfer_path, graph): 
 
@@ -106,41 +116,18 @@ def ComputeCostTransfer(transfer_path, graph):
 
     total_cost = 0
 
-    filtered_transfer_path = FilterTransfer(transfer_path) 
-    transfer = filtered_transfer_path
-
-    for s in range(len(transfer)-1) : 
-        stop1 = transfer[s]
-        stop2 = transfer[s+1]
+    for s in range(len(transfer_path)-1) : 
+        stop1 = transfer_path[s]
+        stop2 = transfer_path[s+1]
 
         edge_data = graph.get_edge_data(stop1, stop2) # fetch the weights from the graph for the edge (stop1, stop2)
 
-        fuel, time = edge_data['fuel_cost'], edge_data['time_cost']
+        fuel = edge_data['fuel_cost']
         
-        total_cost += fuel + time 
+        total_cost += fuel 
 
     return total_cost
 
-def FilterTransfer(transfer_path):
-
-    """
-    Clean the transfer path string from 'EOP+node' to highlight only the path of the transfer
-    
-    @param transfer_path: the list of the overall path of a single transfer
-    
-    @return: path of the transfer alone
-    """
-
-    filtered_transfer = []
-    i = 0 
-    while i < len(transfer_path): 
-        if transfer_path[i] == 'EOP': 
-            i+=2 
-        else: 
-            filtered_transfer.append(transfer_path[i])
-            i+=1 
-
-    return filtered_transfer 
 
 def ComputePenaltyTransfer(transfer_path, graph, chromosome, passengers_dict): 
 
@@ -157,12 +144,10 @@ def ComputePenaltyTransfer(transfer_path, graph, chromosome, passengers_dict):
 
     total_penalty = 0
 
-    filtered_transfer = FilterPassenger(transfer_path) #list of sublists for each passenger
-
     passengers_in_chromosome = [i for i in chromosome if i != 0] #cleaning the zeros 
     cpt = 0
 
-    for passenger_path in filtered_transfer : 
+    for passenger_path in transfer_path : 
         penalty_cost = 0
         passenger_index = passengers_in_chromosome[cpt]
 
@@ -183,40 +168,6 @@ def ComputePenaltyTransfer(transfer_path, graph, chromosome, passengers_dict):
 
     return total_penalty
 
-def FilterPassenger(transfer_path):
-
-    """
-    Segments the trasnfer_path into the partial paths of all the passengers in the transfer.
-    
-    @param transfer_path: the list of the overall path of a single transfer
-    
-    @return: list of lists with all the path of the passengers
-    """
-    
-    input_list = transfer_path[1:]
-
-    try:
-        last_eop_index = len(input_list) - 1 - input_list[::-1].index('EOP')
-    except ValueError:
-        # EOP NOT FOUND, I just return the list without the first element 
-        return []
-
-    list_before_last_eop = input_list[:last_eop_index] #get the list before the last 'EOP'
-
-    # splitting the list before the last EOP 
-    result = []
-    temp_list = []
-    for i in list_before_last_eop:
-        if i == 'EOP':
-            if temp_list:
-                result.append(temp_list)
-            temp_list = []
-        else:
-            temp_list.append(i)
-    if temp_list:
-        result.append(temp_list)
-
-    return result
 
 def ComputeMeanFitness(individuals, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t):
 
@@ -239,7 +190,6 @@ def ComputeMeanFitness(individuals, Fitness, graph, transfer_LUT, passenger_LUT,
     
     return mean_fitness
 
-# MUTATION
 
 def MutationCustomDARPT(child, p):
         
@@ -261,7 +211,6 @@ def MutationCustomDARPT(child, p):
 
     return child
 
-# RECOMBINATION
 
 def CrossoverCustomDARPT(parent1, parent2):
 
@@ -323,13 +272,9 @@ def CrossoverCustomDARPT(parent1, parent2):
         start_index += length
 
     return child
-    
-# SELECTION 
 
 # To compare different strategies, we will implement a roulette wheel selection and a tournament selection 
 # Then, we'll get to decide which one is the most suitable for our DARPT  
-
-# 1 - ROULETTE WHEEL SELECTION 
 
 def RouletteWheelSelection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
 
@@ -388,9 +333,6 @@ def RouletteWheelSelection(population, Fitness, graph, transfer_LUT, passenger_L
         id += 1
     return selected_ind# ,selected_ids
 
-    
-    
-# 2 - TOURNAMENT SELECTION 
 
 def TournamentSelection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, tournament_size): 
 
@@ -423,7 +365,6 @@ def TournamentSelection(population, Fitness, graph, transfer_LUT, passenger_LUT,
     return selected_ind
 
 
-# GENERATE NEXT GENERATION (CHILDREN OF SELECTED PARENTS)
 def GenerateNextGeneration(parent_population, Fitness, nb_individuals, selection_process, proba_mutation, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
 
     """
@@ -448,7 +389,6 @@ def GenerateNextGeneration(parent_population, Fitness, nb_individuals, selection
     for i in range(nb_individuals): 
 
         # 1 : SELECTION 
-
         if selection_process == "roulette" : 
             selected_individuals = RouletteWheelSelection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t)
 

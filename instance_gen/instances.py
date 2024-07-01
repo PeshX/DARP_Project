@@ -4,6 +4,15 @@ import random
 
 def createPassengersTransfersBatch(nb_passengers, nb_transfer):
 
+    """
+    Create the two dictionaries characterizing both passengers and transfers and one node list for the graph
+    
+    @param nb_passengers: total number of passengers to be moved
+    @param nb_transfer: total number of available transfers
+    
+    @return: two dictionaries with key-value pairs represented with integers and one list of integers
+    """
+
     # Create empty dictionaries for transfers and passengers
     looUpTablePassengers = {}    
     looUpTableTransfers = {}
@@ -42,8 +51,23 @@ def createPassengersTransfersBatch(nb_passengers, nb_transfer):
 
     return looUpTableTransfers, looUpTablePassengers, Nodes
 
+
 def createGraphInstance(nodes_list, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, min_degree):
 
+    """
+    Computes a graph object with Networkx library
+    
+    @param nodes_list: a list of the nodes to be used for the graph
+    @param min_weight_fuel: minimum fuel weight to be assigned to a graph's edge
+    @param max_weight_fuel: maximum fuel weight to be assigned to a graph's edge
+    @param min_weight_time: minimum time weight to be assigned to a graph's edge
+    @param max_weight_time: maximum time weight to be assigned to a graph's edge
+    @param min_degree: minimum number of edges departing from a node
+    
+    @return: a NetworkX instance of a undirected weighted graph
+    """
+
+    # Informative print
     print(f"The current number of nodes is {len(nodes_list)}")
 
     # Create a graph object

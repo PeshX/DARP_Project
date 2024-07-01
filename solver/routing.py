@@ -27,6 +27,7 @@ def TransferNodesSequence(transfer_LUT, passenger_LUT, transfer_id, passengers_i
     
     return Nodes_List
 
+
 # Define the combined weight function
 def CombinedWeight(u, v, d, w_f=0.5, w_t=0.5):
 
@@ -43,6 +44,7 @@ def CombinedWeight(u, v, d, w_f=0.5, w_t=0.5):
     """
 
     return w_f * d['fuel_cost'] + w_t * d['time_cost']
+
 
 def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t):
      
@@ -70,7 +72,7 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
      I_cn, I_p = 1,1
 
      transfer_path.extend(nx.dijkstra_path(graph, source = starting_node, target= nodes_list[I_cn][0], weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
-     transfer_path.insert(-1,'SOP')
+     transfer_path.insert(-1,'SOP') # one passenger has been picked-up
      transfer_path.pop()
 
      current_node = nodes_list[I_cn][0]
@@ -89,7 +91,6 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
                 if path_D < path_NextP:
                     
                     transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= current_dest, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
-                    #transfer_path.pop()
                     transfer_path.append('EOP') # one passenger has been dropped
                     current_node = current_dest
                     if I_p<I_cn:
@@ -100,7 +101,7 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
                         
                 else:
                                                        
-                    transfer_path.append('SOP')
+                    transfer_path.append('SOP') # one passenger has been picked-up
                     transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= next_p, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
                     transfer_path.pop()
                     current_node = next_p
@@ -110,7 +111,7 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
                         
             elif (I_cn + 1) < len(nodes_list):
                 
-                transfer_path.append('SOP')
+                transfer_path.append('SOP') # one passenger has been picked-up
                 transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= next_p, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
                 transfer_path.pop()
                 I_p += 1
@@ -123,7 +124,6 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
             else:
                 
                 transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= current_dest, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
-                #transfer_path.pop()
                 transfer_path.append('EOP') # one passenger has been dropped
                 current_node = current_dest
                 if I_p < I_cn:
@@ -132,6 +132,5 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
 
     
      transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= stopping_node, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
-
         
      return transfer_path
