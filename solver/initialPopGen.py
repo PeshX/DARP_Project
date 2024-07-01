@@ -97,7 +97,7 @@ nb_passengers = 1 # total nb of customers
 #capacities = [3, 2, 5]  # capacities of all vehicles 
 capacities = [3, 2]
 
-
+"""
 test_one_sol = generate_individual_at_random(nb_passengers, capacities) 
 #print(test_one_sol)
 print(pretty_solution(test_one_sol))
@@ -105,3 +105,4 @@ print(pretty_solution(test_one_sol))
 test_one_pop = generate_initial_pop(5, nb_passengers, capacities)
 print(pretty_population(test_one_pop))
 print(test_one_pop)
+"""

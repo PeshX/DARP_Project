@@ -30,6 +30,10 @@ initial_pop = generate_initial_pop(N, len(Passenger), vehicles_capacities)
 
 selected_individuals_by_roulette = roulette_wheel_selection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t) 
 selected_individuals_by_tournament = tournament_selection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t, 3)
+print(selected_individuals_by_tournament)
+
+"""
+---- UNCOMMENT TO COMPARE THE TWO SELECTION APPROACHES ---- 
 
 print("WITH ROULETTE SELECTION, THE SELECTIONED INDIVIDUALS ARE:")
 for ind in selected_individuals_by_roulette: 
@@ -39,21 +43,21 @@ print("WITH TOURNAMENT SELECTION, THE SELECTED INDIVIDUALS ARE:")
 for ind in selected_individuals_by_tournament: 
     print(ind)
 
-"""
 To compare both approach, we can compare mean of fitnesses of the selected individuals  
 The bigger the sum is, the worst are the individual, that's a first metric
-"""
+
 mean_fitness_roulette = compute_mean_fitness(selected_individuals_by_roulette, Fitness, G, Transfer, Passenger, w_f, w_t)
 mean_fitness_tournament = compute_mean_fitness(selected_individuals_by_tournament, Fitness, G, Transfer, Passenger, w_f, w_t)
 
 print("mean fitness roulette: ", mean_fitness_roulette)
 print("mean fitness tournament: ", mean_fitness_tournament)
+"""
 
 # GENETIC ALGORITHM 
 
 # 1 - INITIALIZATION 
 nb_iterations = 0 
-selection = "roulette" #"tournament"
+selection = "roulette" #tournament"
 initial_population = generate_initial_pop(nb_individuals=N, nb_passengers=len(Passenger), capacities=vehicles_capacities)
 
 parent_population = initial_population
@@ -68,6 +72,7 @@ mean_of_fitness_whole_pop_from_each_gen = []
 while (nb_iterations <= nb_generations):     
 
     child_population = generate_next_generation(parent_population, Fitness, N, selection, proba_mutation, G, Transfer, Passenger, w_f, w_t)
+    #print(child_population)
     parent_population = child_population 
     nb_iterations += 1
 
@@ -77,10 +82,11 @@ while (nb_iterations <= nb_generations):
     sorted_child_population = sorted(child_population, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
     test = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in sorted_child_population]
     #print(test)
-    #best_ind_from_child_pop = sorted_child_population[0]
-    #best_fitness = fitness(best_ind_from_child_pop,G) 
-    first_non_zero = next((value for value in test if value != 0), None)
-    best_fitness = first_non_zero
+    best_ind_from_child_pop = sorted_child_population[0]
+    best_fitness = Fitness(best_ind_from_child_pop, G, Transfer, Passenger, w_f, w_t)
+    #print(best_fitness)
+    #first_non_zero = next((value for value in test if value != 0), None)
+    #best_fitness = first_non_zero
     best_fitness_from_each_gen.append(best_fitness)
 
     # KPI2 : Fitness of the first X individuals of each generation for the mean 
@@ -100,37 +106,53 @@ generation_indices = range(nb_generations+1)
 
 # NB : try with different selection processes 
 
+print(best_fitness_from_each_gen)
+print(mean_fitness_first_X_ind_from_each_gen)
+print(mean_of_fitness_whole_pop_from_each_gen)
+
 # PLOT 1 : evolution of the fitness along the reproduction process (best fitness for each gen)
-plt.plot(generation_indices, best_fitness_from_each_gen, label="Evolution of the best fitness of each generation")
+plt.plot(generation_indices[::5], best_fitness_from_each_gen[::5], label="Evolution of the best fitness of each generation")
 plt.xlabel('Generation')
 plt.ylabel('Best fitness')
-figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'best_fitness.png')
+plt.title(f"Evolution of the best fitness over the {nb_generations} generations for a population of {N} individuals")
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'best_fitness.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot1.png')
 plt.savefig(figure_path)
+plt.close()
 
 # PLOT 2 : evolution of the mean of the fitness of the X best individuals along the reproduction process 
-plt.plot(generation_indices, mean_fitness_first_X_ind_from_each_gen, label='Evolution of the mean of the fitness of the f"{X} first best individuals')
+plt.plot(generation_indices[::5], mean_fitness_first_X_ind_from_each_gen[::5], label='Evolution of the mean of the fitness of the f"{X} first best individuals')
 plt.xlabel('Generation')
-plt.ylabel('Mean of fitnesses of the f{X} best individuals of the generation')
-figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_best_fitness.png')
+plt.ylabel(f'Mean of fitnesses of the {X} best individuals of the generation')
+plt.title(f"Evolution of the mean fitness of the {X} best individuals over the {nb_generations} generations for a population of {N} individuals")
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_best_fitness.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot2.png')
 plt.savefig(figure_path)
+plt.close()
 
 # PLOT 3 : evolution of the mean of the fitness of all individuals along the reproduction process 
-plt.plot(generation_indices, mean_of_fitness_whole_pop_from_each_gen, label="Evolution of the mean fitness of the whole population")
+plt.plot(generation_indices[::5], mean_of_fitness_whole_pop_from_each_gen[::5], label="Evolution of the mean fitness of the whole population")
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of all individuals')
-figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_fitness.png')
+plt.title(f"Evolution of the mean fitness over the {nb_generations} generations for a population of {N} individuals")
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_fitness.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot3.png')
 plt.savefig(figure_path)
+plt.close()
 
 # PLOT 4 : all 3 curves 
-plt.figure(figsize=(10,8))
-plt.plot(generation_indices[::50], best_fitness_from_each_gen[::50], 'b', label="Evolution of the best fitness")
-plt.plot(generation_indices[::50], mean_fitness_first_X_ind_from_each_gen[::50], 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
-plt.plot(generation_indices[::50], mean_of_fitness_whole_pop_from_each_gen[::50], 'g', label="Evolution of the mean fitness of the whole population")
-plt.xlabel('Génération')
-plt.title(f"Evolution des fitness au cours des {nb_generations} générations pour une population de {N} individus")
+plt.figure(figsize=(14,12))
+plt.plot(generation_indices[::5], best_fitness_from_each_gen[::5], 'b', label="Evolution of the best fitness")
+plt.plot(generation_indices[::5], mean_fitness_first_X_ind_from_each_gen[::5], 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
+plt.plot(generation_indices[::5], mean_of_fitness_whole_pop_from_each_gen[::5], 'g', label="Evolution of the mean fitness of the whole population")
+plt.xlabel('Generation')
+plt.ylabel('Fitness')
+plt.title(f"Evolution of the fitnesses over the {nb_generations} generations for a population of {N} individuals")
 plt.legend()
-figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'fitness_evolution.png')
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'fitness_evolution.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot4.png')
 plt.savefig(figure_path)
+plt.close()
 
 
 # PLOT 5 : graph of the scenario 
@@ -148,6 +170,7 @@ nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
 # Display the plot with informative box
 plt.title('Graph of the current scenario')
-figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'graph.png')
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'graph.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot5.png')
 plt.savefig(figure_path)
 
