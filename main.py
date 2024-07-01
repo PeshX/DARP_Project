@@ -28,8 +28,8 @@ initial_pop = generate_initial_pop(N, len(Passenger), vehicles_capacities)
 
 # SELECTION PROCESS 
 
-selected_individuals_by_roulette = roulette_wheel_selection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t) 
-selected_individuals_by_tournament = tournament_selection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t, 3)
+selected_individuals_by_roulette = RouletteWheelSelection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t) 
+selected_individuals_by_tournament = TournamentSelection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t, 3)
 print(selected_individuals_by_tournament)
 
 """
@@ -71,7 +71,7 @@ mean_of_fitness_whole_pop_from_each_gen = []
 # 3 - RUNNING THE ALGORITHM 
 while (nb_iterations <= nb_generations):     
 
-    child_population = generate_next_generation(parent_population, Fitness, N, selection, proba_mutation, G, Transfer, Passenger, w_f, w_t)
+    child_population = GenerateNextGeneration(parent_population, Fitness, N, selection, proba_mutation, G, Transfer, Passenger, w_f, w_t)
     #print(child_population)
     parent_population = child_population 
     nb_iterations += 1
@@ -106,9 +106,9 @@ generation_indices = range(nb_generations+1)
 
 # NB : try with different selection processes 
 
-print(best_fitness_from_each_gen)
-print(mean_fitness_first_X_ind_from_each_gen)
-print(mean_of_fitness_whole_pop_from_each_gen)
+#print(best_fitness_from_each_gen)
+#print(mean_fitness_first_X_ind_from_each_gen)
+#print(mean_of_fitness_whole_pop_from_each_gen)
 
 # PLOT 1 : evolution of the fitness along the reproduction process (best fitness for each gen)
 plt.plot(generation_indices[::5], best_fitness_from_each_gen[::5], label="Evolution of the best fitness of each generation")

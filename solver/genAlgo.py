@@ -6,6 +6,19 @@ from .routing import RoutingAlgorithm
 
 def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
 
+    """
+    Computes the fitness of an individual.
+    
+    @param individuals: a list of lists representing a solution
+    @param graph: the instance of the graph built with NetworkX
+    @param transfer_LUT: dictionary of the transfers
+    @param passenger_LUT: dictionary of the passengers
+    @param w_f: weight for the fuel attribute of the graph's edges
+    @param w_t: weight for the time attribute of the graph's edges
+    
+    @return: the fitness of the individual
+    """
+
     # Define fitness of the individual 
     individual_fitness = 0
 
@@ -23,10 +36,10 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
             transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
 
             # Compute cost for the overall trasnfer path
-            chromosome_cost = compute_costs_transfer(transfer_path, graph)
+            chromosome_cost = ComputeCostTransfer(transfer_path, graph)
 
             # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
-            penalty_cost = compute_penalty_transfer(transfer_path, graph, chromosome, passenger_LUT)
+            penalty_cost = ComputePenaltyTransfer(transfer_path, graph, chromosome, passenger_LUT)
 
             # Sum up to the individual fitness
             individual_fitness += chromosome_cost + penalty_cost
@@ -36,11 +49,21 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
 
     return individual_fitness
 
-def compute_costs_transfer(transfer_path, graph): 
-    # Given the overall path of the transfer, we compute its cost (fuel + time)
+def ComputeCostTransfer(transfer_path, graph): 
+
+    """
+    Computes the cost of the transfer path, composed of the fuel cost alone.
+    N.B. the time_cost is added by the penalty of the passengers
+    
+    @param transfer_path: the list of the overall path of a single transfer
+    @param graph: the instance of the graph built with NetworkX
+    
+    @return: the total cost of the transfer
+    """
+
     total_cost = 0
 
-    filtered_transfer_path = filter_transfer(transfer_path) 
+    filtered_transfer_path = FilterTransfer(transfer_path) 
     transfer = filtered_transfer_path
 
     for s in range(len(transfer)-1) : 
@@ -52,11 +75,19 @@ def compute_costs_transfer(transfer_path, graph):
         fuel, time = edge_data['fuel_cost'], edge_data['time_cost']
         
         total_cost += fuel + time 
+
     return total_cost
 
-    return 0 
+def FilterTransfer(transfer_path):
 
-def filter_transfer(transfer_path): 
+    """
+    Clean the transfer path string from 'EOP+node' to highlight only the path of the transfer
+    
+    @param transfer_path: the list of the overall path of a single transfer
+    
+    @return: path of the transfer alone
+    """
+
     filtered_transfer = []
     i = 0 
     while i < len(transfer_path): 
@@ -68,11 +99,22 @@ def filter_transfer(transfer_path):
 
     return filtered_transfer 
 
-def compute_penalty_transfer(transfer_path, graph, chromosome, passengers_dict): 
+def ComputePenaltyTransfer(transfer_path, graph, chromosome, passengers_dict): 
+
+    """
+    Computes the penalty associated to the transfer coming from the time_request condition of each passenger
+    
+    @param transfer_path: the list of the overall path of a single transfer
+    @param graph: the instance of the graph built with NetworkX
+    @param chromosome: the list of the passengers within the current transfer
+    @param passengers_dict: dictionary of the passengers
+    
+    @return: the total penalty of the transfer
+    """
 
     total_penalty = 0
 
-    filtered_transfer = filter_transfer2(transfer_path) #list of sublists for each passenger
+    filtered_transfer = FilterPassenger(transfer_path) #list of sublists for each passenger
 
     passengers_in_chromosome = [i for i in chromosome if i != 0] #cleaning the zeros 
     cpt = 0
@@ -98,7 +140,15 @@ def compute_penalty_transfer(transfer_path, graph, chromosome, passengers_dict):
 
     return total_penalty
 
-def filter_transfer2(transfer_path):
+def FilterPassenger(transfer_path):
+
+    """
+    Segments the trasnfer_path into the partial paths of all the passengers in the transfer.
+    
+    @param transfer_path: the list of the overall path of a single transfer
+    
+    @return: list of lists with all the path of the passengers
+    """
     
     input_list = transfer_path[1:]
 
@@ -125,13 +175,18 @@ def filter_transfer2(transfer_path):
 
     return result
 
-def compute_mean_fitness(individuals, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t):
+def ComputeMeanFitness(individuals, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t):
+
     """
     Computes the mean fitness of a list of individuals.
     
     @param individuals: a list of individuals/solutions
     @param fitness: the numeric function that evaluates the "goodness" of a solution
-    @param graph: the instance
+    @param graph: the instance of the graph built with NetworkX
+    @param transfer_LUT: dictionary of the transfers
+    @param passenger_LUT: dictionary of the passengers
+    @param w_f: weight for the fuel attribute of the graph's edges
+    @param w_t: weight for the time attribute of the graph's edges
     
     @return: the mean fitness of the individuals
     """
@@ -144,18 +199,38 @@ def compute_mean_fitness(individuals, Fitness, graph, transfer_LUT, passenger_LU
 # MUTATION
 
 def MutationCustomDARPT(child, p):
-        # Overcoming probability of mutation
-        if p > random.uniform(0.0,1.0):
-            # Randomly choose a transfer to be mutated
-            idMutatedTransfer = random.randint(0,len(child)-1)
-            # Apply custom mutation to the selected transfer -> shuffle the passengers in it
-            random.shuffle(child[idMutatedTransfer])
+        
+    """
+    Performs a mutation operator on a newly generated child, acting on its genes (passengers)
+    
+    @param child: newly generated individual (complete solution)
+    @param p: probability of having a mutation
+    
+    @return: the individual passed where one of its chromosome (transfer) has its genes permuted
+    """
 
-        return child
+    # Overcoming probability of mutation
+    if p > random.uniform(0.0,1.0):
+        # Randomly choose a transfer to be mutated
+        idMutatedTransfer = random.randint(0,len(child)-1)
+        # Apply custom mutation to the selected transfer -> shuffle the passengers in it
+        random.shuffle(child[idMutatedTransfer])
+
+    return child
 
 # RECOMBINATION
 
 def CrossoverCustomDARPT(parent1, parent2):
+
+    """
+    Generates one child from the recombination operator acting on two parent
+    
+    @param parent1: one individual
+    @param parent2: another individual
+    
+    @return: the child generated by cross-mixing a list of genes from parent1 into parent2
+    N.B. Feasibility is preserved with this custom implementation
+    """
 
     # Save transfers dimension, equal for both parents
     dims = [len(parent1[i]) for i in range(len(parent1))]
@@ -209,17 +284,23 @@ def CrossoverCustomDARPT(parent1, parent2):
 # SELECTION 
 
 # To compare different strategies, we will implement a roulette wheel selection and a tournament selection 
-# Then, we'll get to decide which one is the most suitable for our DARP problem 
+# Then, we'll get to decide which one is the most suitable for our DARPT  
 
 # 1 - ROULETTE WHEEL SELECTION 
 
-def roulette_wheel_selection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
+def RouletteWheelSelection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
+
     """
     @param population, a pool of individuals/solutions 
     @param fitness, the numeric function that evaluates the "goodness" of a solution 
-    @param graph, the instance 
-    return a list of selected solutions/individuals, according to the roulette wheel selection
-            ##and a list of the corresponding ids 
+    @param graph: the instance of the graph built with NetworkX
+    @param transfer_LUT: dictionary of the transfers
+    @param passenger_LUT: dictionary of the passengers
+    @param w_f: weight for the fuel attribute of the graph's edges
+    @param w_t: weight for the time attribute of the graph's edges
+
+    @return a list of selected solutions/individuals, according to the roulette wheel selection
+            and a list of the corresponding ids 
     """
 
     #individuals_by_id = {}
@@ -268,14 +349,19 @@ def roulette_wheel_selection(population, Fitness, graph, transfer_LUT, passenger
     
 # 2 - TOURNAMENT SELECTION 
 
-def tournament_selection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, tournament_size): 
+def TournamentSelection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, tournament_size): 
 
     """
-    @param population, a pool of individuals/solutions 
-    @param fitness, the numeric function that evaluates the "goodness" of a solution 
-    @param graph, the instance 
+    @param population: a pool of individuals/solutions 
+    @param Fitness: the numeric function that evaluates the "goodness" of a solution 
+    @param graph: the instance of the graph built with NetworkX
+    @param transfer_LUT: dictionary of the transfers
+    @param passenger_LUT: dictionary of the passengers
+    @param w_f: weight for the fuel attribute of the graph's edges
+    @param w_t: weight for the time attribute of the graph's edges
     @param tournamen_size, the nb of individuals to participate in each tournament 
-    return a list of selected solutions/individuals, according to the simple tournament selection process based on fitness 
+
+    @return a list of selected solutions/individuals, according to the simple tournament selection process based on fitness 
     """
 
     selected_ind = []
@@ -295,29 +381,42 @@ def tournament_selection(population, Fitness, graph, transfer_LUT, passenger_LUT
 
 
 # GENERATE NEXT GENERATION (CHILDREN OF SELECTED PARENTS)
-def generate_next_generation(parent_population, Fitness, nb_individuals, selection_process, proba_mutation, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
+def GenerateNextGeneration(parent_population, Fitness, nb_individuals, selection_process, proba_mutation, graph, transfer_LUT, passenger_LUT, w_f, w_t): 
+
     """
     Combining all processes, it generates a new population from a parent one (through crossover, mutation, selection)
     It will be called at each iteration of the algorithm
+
+    @param parent_population: the whole parent population of individuals
+    @param Fitness: the numeric function that evaluates the "goodness" of a solution
+    @param nb_individuals: the number of individuals in the current population
+    @param selection_process: the type of selection process to be used
+    @param proba_mutation: probability of having a mutation
+    @param graph: the instance of the graph built with NetworkX
+    @param transfer_LUT: dictionary of the transfers
+    @param passenger_LUT: dictionary of the passengers
+    @param w_f: weight for the fuel attribute of the graph's edges
+    @param w_t: weight for the time attribute of the graph's edges  
+
+    @return: the children populationg generated according to this process  
     """
     children_pop = []
 
     for i in range(nb_individuals): 
-        #print("i", i)
 
         # 1 : SELECTION 
 
         if selection_process == "roulette" : 
-            selected_individuals = roulette_wheel_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t)
+            selected_individuals = RouletteWheelSelection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t)
 
             while(len(selected_individuals) < 2) : 
-                selected_individuals = roulette_wheel_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t)
+                selected_individuals = RouletteWheelSelection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t)
 
         elif selection_process == "tournament" : 
-            selected_individuals = tournament_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, 3)
+            selected_individuals = TournamentSelection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, 3)
 
             while(len(selected_individuals) < 2) : 
-                selected_individuals = tournament_selection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, 3)
+                selected_individuals = TournamentSelection(parent_population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, 3)
 
         random_picked_parents = random.sample(selected_individuals, 2)
         parent1 = random_picked_parents[0]

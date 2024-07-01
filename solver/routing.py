@@ -2,6 +2,18 @@
 import networkx as nx
 
 def TransferNodesSequence(transfer_LUT, passenger_LUT, transfer_id, passengers_in_transfer):
+
+    """
+    Find the start/stop of transfer and of all passengers within the chromosome
+    
+    @param transfer_LUT: dictionary of the transfers
+    @param passenger_LUT: dictionary of the passengers
+    @param transfer_id: the number of the transfer we are analyzing
+    @param passengers_in_transfer: list of the passengers on-board of the transfer
+    
+    @return: a list of tuples, the first one regards the transfer while the other are for the passengers
+    """
+
     Nodes_List = []
     # Append the transfer node to the list
     Nodes_List.append(transfer_LUT[transfer_id][0:2])
@@ -15,12 +27,38 @@ def TransferNodesSequence(transfer_LUT, passenger_LUT, transfer_id, passengers_i
     
     return Nodes_List
 
-
 # Define the combined weight function
 def CombinedWeight(u, v, d, w_f=0.5, w_t=0.5):
+
+    """
+    Linearly combines the two attributes of an edge (to be used inside a lambda function)
+    
+    @param u: starting node
+    @param v: stopping node
+    @param d: edge between 'u' and 'v'
+    @param w_f: weight for the fuel attribute of the graph's edges
+    @param w_t: weight for the time attribute of the graph's edges
+    
+    @return: a list of tuples, the first one regards the transfer while the other are for the passengers
+    """
+
     return w_f * d['fuel_cost'] + w_t * d['time_cost']
 
 def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t):
+     
+     """
+     Compute the overall route of a transfer in the pick-up/drop of all its passengers
+    
+     @param chromosome: a list of the passenger within a transfer
+     @param graph: the instance of the graph built with NetworkX
+     @param n_transfer: the number of the transfer we are analyzing 
+     @param transfer_LUT: dictionary of the transfers
+     @param passenger_LUT: dictionary of the passengers
+     @param w_f: weight for the fuel attribute of the graph's edges
+     @param w_t: weight for the time attribute of the graph's edges
+    
+     @return: list of the path of a transfer
+     """
      
      nodes_list = TransferNodesSequence(transfer_LUT, passenger_LUT, n_transfer, chromosome)
 
