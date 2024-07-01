@@ -8,14 +8,14 @@ import matplotlib.pyplot as plt
 
 # ALGORITHM PARAMETERS 
 N = 20 #nb of individuals in the initial population
-nb_generations = 500
+nb_generations = 100
 proba_mutation = 0.4 #proba for an ind to be muted 
 # Set weights for fuel cost and time cost
 w_f = 0.4  # Weight for fuel cost
 w_t = 0.6  # Weight for time cost
 
 # INSTANCE CREATION 
-Transfer, Passenger, Nodes = createPassengersTransfersBatch(2,2)
+Transfer, Passenger, Nodes = createPassengersTransfersBatch(20,4)
 
 # Create graph according to user
 G = createGraphInstance(Nodes,1,10,20,100,2)

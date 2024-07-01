@@ -36,7 +36,8 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
 
      current_node = nodes_list[I_cn][0]
      current_dest = nodes_list[I_p][1]
-     next_p = nodes_list[I_cn+1][0]
+     if I_cn+1 < len(nodes_list):
+        next_p = nodes_list[I_cn+1][0]
    
      # Using a lambda function within a for loop
      while current_node != nodes_list[-1][1]:
@@ -71,8 +72,9 @@ def RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT,
                 
                 transfer_path.extend(nx.dijkstra_path(graph, source = current_node, target= next_p, weight=lambda u, v, d: CombinedWeight(u, v, d, w_f, w_t)))
                 transfer_path.pop()
+                I_p += 1
                 current_node = next_p
-                current_dest = nodes_list[I_cn+1][1]
+                current_dest = nodes_list[I_p][1]
                 I_cn += 1
                 if I_cn+1 < len(nodes_list):
                     next_p = nodes_list[I_cn+1][0]

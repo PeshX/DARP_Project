@@ -14,19 +14,25 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
     # Iterate over the chromosomes (transfers) in the individual
     for chromosome in individual:
 
-        # Retrieve the overall path of the transfer
-        transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
+        # Check if the transfer is not empty, if so skip to the next one
+        if all(v == 0 for v in chromosome): 
+            # Increase transfer number according to index of chromosome + 1
+            n_transfer += 1
+        else:
+            # Retrieve the overall path of the transfer
+            transfer_path = RoutingAlgorithm(chromosome, graph, n_transfer, transfer_LUT, passenger_LUT, w_f, w_t)
 
-        chromosome_cost = compute_costs_transfer(transfer_path, graph)
+            # Compute cost for the overall trasnfer path
+            chromosome_cost = compute_costs_transfer(transfer_path, graph)
 
-        # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
-        penalty_cost = compute_penalty_transfer(transfer_path, graph, chromosome, passenger_LUT)
+            # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
+            penalty_cost = compute_penalty_transfer(transfer_path, graph, chromosome, passenger_LUT)
 
-        # Sum up to the individual fitness
-        individual_fitness += chromosome_cost + penalty_cost
+            # Sum up to the individual fitness
+            individual_fitness += chromosome_cost + penalty_cost
 
-        # Increase transfer number according to index of chromosome + 1
-        n_transfer += 1
+            # Increase transfer number according to index of chromosome + 1
+            n_transfer += 1
 
     return individual_fitness
 
@@ -66,13 +72,12 @@ def compute_penalty_transfer(transfer_path, graph, chromosome, passengers_dict):
 
     total_penalty = 0
 
-    filtered_transfer = filter_transfer2(transfer_path) #list of sublists for each passenger 
-    transfer_path = filtered_transfer
+    filtered_transfer = filter_transfer2(transfer_path) #list of sublists for each passenger
 
     passengers_in_chromosome = [i for i in chromosome if i != 0] #cleaning the zeros 
     cpt = 0
 
-    for passenger_path in transfer_path : 
+    for passenger_path in filtered_transfer : 
         penalty_cost = 0
         passenger_index = passengers_in_chromosome[cpt]
 
