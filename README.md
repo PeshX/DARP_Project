@@ -1,7 +1,7 @@
 ## Getting started
 The organization of the project is the following:
 - **instance_gen**: folder in which there is a package for the generation of the instance for a complete run of the source code
-- **plots**: empty folder which will be filled with meaninful plots, generated and overwritten at each run of the source code
+- **plots**: empty folder which will be filled with meaningful plots, generated and overwritten at each run of the source code
 - **solver**: folder in which there are all the packages which deals with heuristic (GA) and operative functions
 - <ins>main.py</ins>: main file which ensembles all the content of the packages
 
