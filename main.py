@@ -144,7 +144,7 @@ plt.plot(generation_indices[::25], best_fitness_from_each_gen1[::25], label="Evo
 plt.xlabel('Generation')
 plt.ylabel('Best fitness')
 plt.title(f"Evolution of the best fitness for a population of {N} individuals")
-figure_path = os.path.join(user_path, 'best_fitness.png')
+figure_path = os.path.join(user_path, 'plot1_r.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -153,7 +153,7 @@ plt.plot(generation_indices[::25], best_fitness_from_each_gen2[::25], label="Evo
 plt.xlabel('Generation')
 plt.ylabel('Best fitness')
 plt.title(f"Evolution of the best fitness for a population of {N} individuals")
-figure_path = os.path.join(user_path, 'best_fitness.png')
+figure_path = os.path.join(user_path, 'plot1_t.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -163,7 +163,7 @@ plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen1[::25]
 plt.xlabel('Generation')
 plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
 plt.title(f"Evolution of the mean fitness of the {X} best individuals")
-figure_path = os.path.join(user_path, 'mean_best_fitness.png')
+figure_path = os.path.join(user_path, 'plot2_r.png.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -172,7 +172,7 @@ plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen2[::25]
 plt.xlabel('Generation')
 plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
 plt.title(f"Evolution of the mean fitness of the {X} best individuals")
-figure_path = os.path.join(user_path, 'mean_best_fitness.png')
+figure_path = os.path.join(user_path, 'plot2_t.png')
 plt.close()
 
 # PLOT 3 : evolution of the mean of the fitness of all individuals along the reproduction process 
@@ -181,7 +181,7 @@ plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen1[::25
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of all individuals')
 plt.title(f"Evolution of the mean fitness of the whole population")
-figure_path = os.path.join(user_path, 'mean_fitness.png')
+figure_path = os.path.join(user_path, 'plot3_r.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -190,7 +190,7 @@ plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen2[::25
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of all individuals')
 plt.title(f"Evolution of the mean fitness of the whole population")
-figure_path = os.path.join(user_path, 'mean_fitness.png')
+figure_path = os.path.join(user_path, 'plot3_t.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -204,7 +204,7 @@ plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.title(f"Evolution of the fitnesses over the {nb_generations} generations for a population of {N} individuals")
 plt.legend()
-figure_path = os.path.join(user_path, 'fitness_evolution.png')
+figure_path = os.path.join(user_path, 'plot4_r.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -217,7 +217,7 @@ plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.title(f"Evolution of the fitnesses over the {nb_generations} generations for a population of {N} individuals")
 plt.legend()
-figure_path = os.path.join(user_path, 'fitness_evolution.png')
+figure_path = os.path.join(user_path, 'plot4_t.png')
 plt.savefig(figure_path)
 plt.close()
 
