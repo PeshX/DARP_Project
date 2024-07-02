@@ -1,6 +1,7 @@
 import random
 import numpy as np
 from .routing import RoutingAlgorithm 
+import pdb
 
 def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
 
@@ -255,22 +256,16 @@ def CrossoverCustomDARPT(parent1, parent2):
     # Create a list of the remaining elements from the second parent
     remaining_elements = [item for item in par2 if item not in child_flat]
     
-    # Fill remaining slots with the remaining elements from the second parent
-    current_index = 0
-    i = 0
-    while i < (size) and current_index < len(remaining_elements):
-        # Add random check for filling the list
-        if random.uniform(0.0,1.0) > 0.5: # Fill starting from the beginning
-            # Fill only if the i-th element is a zero
-            if child_flat[i] == 0:
-                child_flat[i] = remaining_elements[current_index]
-                current_index += 1
-        else: # Fill starting from the end
-            # Fill only if the i-th element is a zero
-            if child_flat[size-1-i] == 0:
-                child_flat[size-1-i] = remaining_elements[current_index]
-                current_index += 1
-        i += 1
+    # Get the positions of all the zero elements
+    free_indexes = [index for index in range(len(child_flat)) if child_flat[index]==0]
+
+    # Get the indexes to assign to each remaining element
+    indexes_to_assign = random.sample(free_indexes,len(remaining_elements))
+
+    # Fill the selected slots with the remaining elements from the second parent
+    for i,ind in enumerate(indexes_to_assign):
+
+        child_flat[ind] = remaining_elements[i]
 
     # Reconstruct list of lists for child
     child = []
@@ -279,6 +274,11 @@ def CrossoverCustomDARPT(parent1, parent2):
         sublist = child_flat[start_index:start_index + length]
         child.append(sublist)
         start_index += length
+    # Check for crossover for nb=20
+    check = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+    flat = [x for xs in child for x in xs]
+    if (all(elem in flat for elem in check) == False):
+            pdb.set_trace()    
 
     return child
 

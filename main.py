@@ -8,12 +8,20 @@ from solver import *
 N = 20                      #nb of individuals in the initial population
 nb_generations = 500        # nb of new generations in the population
 proba_mutation = 0.4        #proba for an ind to be muted 
-w_f = 0.4                   # Weight for fuel cost
-w_t = 0.6                   # Weight for time cost
+w_f = 0.4                   # Weight for fuel cost in the fitness
+w_t = 0.6                   # Weight for time cost in the fitness
+nb_passengers = 20          # Number of passengers  
+nb_transfers = 4            # Number of transfers -> consider a capacity of
+min_fuel = 1                # min fuel weight for edges
+max_fuel = 10               # max fuel weight froi edges
+min_time = 5                # min time weight for edges
+max_time = 60               # max time weight for edges
+min_degree = 2              # min degree of graph's nodes
+user_path = r'C:\Users\marco\Documents\GitHub\DARP_Project\plots' # TODO: fill used path with 'r' at the beginning
 
 # Instance creation
-Transfer, Passenger, Nodes = createPassengersTransfersBatch(20,4)
-G = createGraphInstance(Nodes,1,10,20,100,2)
+Transfer, Passenger, Nodes = createPassengersTransfersBatch(nb_passengers,nb_transfers)
+G = createGraphInstance(Nodes,min_fuel,max_fuel,min_time,max_time,min_degree)
 
 # Fetch transfers' capacities
 vehicles_capacities = [Transfer[transfer][2] for transfer in Transfer]  
@@ -24,7 +32,6 @@ initial_pop = generate_initial_pop(N, len(Passenger), vehicles_capacities)
 # Selection processes
 selected_individuals_by_roulette = RouletteWheelSelection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t) 
 selected_individuals_by_tournament = TournamentSelection(initial_pop, Fitness, G, Transfer, Passenger, w_f, w_t, 3)
-print(selected_individuals_by_tournament)
 
 """
 ---- UNCOMMENT TO COMPARE THE TWO SELECTION APPROACHES ---- 
@@ -50,6 +57,7 @@ print("mean fitness tournament: ", mean_fitness_tournament)
 # GENETIC ALGORITHM -------------------------------------------------------------------------------------------------------------
 
 # 1 - Initialization 
+
 nb_iterations = 0 
 selection1 = "roulette" 
 selection2 = "tournament"
@@ -62,6 +70,7 @@ parent_population1 = initial_population
 parent_population2 = initial_population
 
 # 2 - Prepare data for performance analytics 
+
 # Roulette selection
 best_fitness_from_each_gen1 = []
 mean_fitness_first_X_ind_from_each_gen1 = []
@@ -135,8 +144,7 @@ plt.plot(generation_indices[::25], best_fitness_from_each_gen1[::25], label="Evo
 plt.xlabel('Generation')
 plt.ylabel('Best fitness')
 plt.title(f"Evolution of the best fitness for a population of {N} individuals")
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'best_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot1_r.png')
+figure_path = os.path.join(user_path, 'best_fitness.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -145,8 +153,7 @@ plt.plot(generation_indices[::25], best_fitness_from_each_gen2[::25], label="Evo
 plt.xlabel('Generation')
 plt.ylabel('Best fitness')
 plt.title(f"Evolution of the best fitness for a population of {N} individuals")
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'best_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot1_t.png')
+figure_path = os.path.join(user_path, 'best_fitness.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -156,8 +163,7 @@ plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen1[::25]
 plt.xlabel('Generation')
 plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
 plt.title(f"Evolution of the mean fitness of the {X} best individuals")
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_best_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot2_r.png')
+figure_path = os.path.join(user_path, 'mean_best_fitness.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -166,9 +172,7 @@ plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen2[::25]
 plt.xlabel('Generation')
 plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
 plt.title(f"Evolution of the mean fitness of the {X} best individuals")
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_best_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot2_t.png')
-plt.savefig(figure_path)
+figure_path = os.path.join(user_path, 'mean_best_fitness.png')
 plt.close()
 
 # PLOT 3 : evolution of the mean of the fitness of all individuals along the reproduction process 
@@ -177,8 +181,7 @@ plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen1[::25
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of all individuals')
 plt.title(f"Evolution of the mean fitness of the whole population")
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot3_r.png')
+figure_path = os.path.join(user_path, 'mean_fitness.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -187,8 +190,7 @@ plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen2[::25
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of all individuals')
 plt.title(f"Evolution of the mean fitness of the whole population")
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot3_t.png')
+figure_path = os.path.join(user_path, 'mean_fitness.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -202,8 +204,7 @@ plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.title(f"Evolution of the fitnesses over the {nb_generations} generations for a population of {N} individuals")
 plt.legend()
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'fitness_evolution.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot4_r.png')
+figure_path = os.path.join(user_path, 'fitness_evolution.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -216,8 +217,7 @@ plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.title(f"Evolution of the fitnesses over the {nb_generations} generations for a population of {N} individuals")
 plt.legend()
-#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'fitness_evolution.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot4_t.png')
+figure_path = os.path.join(user_path, 'fitness_evolution.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -231,7 +231,22 @@ plt.close()
 # edge_labels = {(u, v): f'({d["fuel_cost"]}, {d["time_cost"]})' for u, v, d in G.edges(data=True)}
 # nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 # plt.title('Graph of the current scenario')
-# figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'graph.png')
-# figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot5.png')
+# figure_path = os.path.join(user_path, 'graph.png')
 # plt.savefig(figure_path)
 
+
+# PRINTING BEST SOLUTIONS OBTAINED ---------------------------------------------------------------------------------------
+
+# Roulette selection 
+final_pop_sorted_by_fitness1 = sorted(child_population1, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
+best_solution1 = final_pop_sorted_by_fitness1[0]
+best_solution_fitness1 = Fitness(best_solution1, G, Transfer, Passenger, w_f, w_t)
+print("Best solution obtained with the roulette wheel selection :", best_solution1)
+print("Fitness of the best solution:", best_solution_fitness1)
+
+# Tournament selection 
+final_pop_sorted_by_fitness2 = sorted(child_population2, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
+best_solution2 = final_pop_sorted_by_fitness2[0]
+best_solution_fitness2 = Fitness(best_solution2, G, Transfer, Passenger, w_f, w_t)
+print("Best solution obtained with the tournament selection :", best_solution2)
+print("Fitness of the best solution:", best_solution_fitness2)
