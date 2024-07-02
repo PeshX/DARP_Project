@@ -1,9 +1,9 @@
 ## Getting started
 The organization of the project is the following:
-- instance_gen: folder in which there is a package for the generation of the instance for a complete run of the source code
-- plots: empty folder which will be filled with meaninful plots, generated and overwritten at each run of the source code
-- solver: folder in which there are all the packages which deals with heuristic (GA) and operative functions
-- main.py: main file which ensembles all the content of the packages
+- **instance_gen**: folder in which there is a package for the generation of the instance for a complete run of the source code
+- **plots**: empty folder which will be filled with meaninful plots, generated and overwritten at each run of the source code
+- **solver**: folder in which there are all the packages which deals with heuristic (GA) and operative functions
+- <ins>main.py</ins>: main file which ensembles all the content of the packages
 
 ## Parameters
 In main.py, from line 9 to line 21, the parameters for the execution of the code and their meaning can be found, regarding both instance generation and GA parameters.
@@ -22,7 +22,7 @@ The code is ready-to-run and right after it has been correctly downloaded it can
 
 ## Results and Generated plots
 Once the execution of the code has ended, the results regarding the overall fitness values of the GA will be available in the 'plot' folder. Since we implemented two selection operators (roulette_wheel and tournament), the name of the figures will be 'plotX_r' if it regards the roulette while 'plotX_t' if it regards the tournament, with X going from 1 to 4. Overall, 8 plots will be generated.\
-On the terminal it will be printed:
-- the number of nodes in the current graph
+In addition, on the terminal it will be printed:
+- number of nodes in the current graph
 - the best individual obtained with roulette wheel selection and its fitness
 - the best individual obtained with tournament selection and its fitness
