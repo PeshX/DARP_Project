@@ -1,5 +1,5 @@
 ## Getting started
-The organization of the project is the following:
+The organization of the project, which can be found at https://github.com/PeshX/DARP_Project, where this README.md can be visualized in a clear format, is the following:
 - **instance_gen**: folder dealing with the generation of a complete instance of the DARPT
 - **plots**: folder filled with meaningful plots, generated and overwritten at each run of the source code
 - **solver**: folder in which there are all the packages which deals with heuristic (GA) and operative functions
