@@ -273,12 +273,7 @@ def CrossoverCustomDARPT(parent1, parent2):
     for length in dims:
         sublist = child_flat[start_index:start_index + length]
         child.append(sublist)
-        start_index += length
-    # Check for crossover for nb=20
-    check = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-    flat = [x for xs in child for x in xs]
-    if (all(elem in flat for elem in check) == False):
-            pdb.set_trace()    
+        start_index += length  
 
     return child
 
