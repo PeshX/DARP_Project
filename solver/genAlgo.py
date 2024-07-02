@@ -37,7 +37,7 @@ def Fitness(individual, graph, transfer_LUT, passenger_LUT, w_f, w_t):
             transfer_path, passenger_paths = PathTransferPassenger(overall_path)
 
             # Compute cost for the overall trasnfer path
-            chromosome_cost = ComputeCostTransfer(transfer_path, graph)
+            chromosome_cost = ComputeCostTransfer(transfer_path, graph, w_f, w_t)
 
             # Add a penalty for every passenger if he has arrived later that its request (stored in the dictionary)
             penalty_cost = ComputePenaltyTransfer(passenger_paths, graph, chromosome, passenger_LUT)
@@ -102,11 +102,11 @@ def PathTransferPassenger(overall_path):
     return transfer_path, true_filtered_segmentation
 
 
-def ComputeCostTransfer(transfer_path, graph): 
+def ComputeCostTransfer(transfer_path, graph, w_f, w_t): 
 
     """
-    Computes the cost of the transfer path, composed of the fuel cost alone.
-    N.B. the time_cost is added by the penalty of the passengers
+    Computes the cost of the transfer path, composed of the combination of fuel and time.
+    N.B. A penalty is added by the passengers later
     
     @param transfer_path: the list of the overall path of a single transfer
     @param graph: the instance of the graph built with NetworkX
@@ -122,9 +122,9 @@ def ComputeCostTransfer(transfer_path, graph):
 
         edge_data = graph.get_edge_data(stop1, stop2) # fetch the weights from the graph for the edge (stop1, stop2)
 
-        fuel = edge_data['fuel_cost']
+        fuel, time = edge_data['fuel_cost'], edge_data['time_cost']
         
-        total_cost += fuel 
+        total_cost += w_f * fuel + w_t * time 
 
     return total_cost
 
@@ -139,34 +139,43 @@ def ComputePenaltyTransfer(transfer_path, graph, chromosome, passengers_dict):
     @param chromosome: the list of the passengers within the current transfer
     @param passengers_dict: dictionary of the passengers
     
-    @return: the total penalty of the transfer
+    @return: the total time penalty of the transfer
     """
 
-    total_penalty = 0
+    total_delay = 0
 
     passengers_in_chromosome = [i for i in chromosome if i != 0] #cleaning the zeros 
     cpt = 0
 
     for passenger_path in transfer_path : 
         penalty_cost = 0
+        service_time = 0
         passenger_index = passengers_in_chromosome[cpt]
 
+        # Compute total service time for each passenger
         for s in range(len(passenger_path)-1) : 
             stop1 = passenger_path[s]
             stop2 = passenger_path[s+1]
 
             edge_data = graph.get_edge_data(stop1, stop2) # fetch the weights from the graph for the edge (stop1, stop2)
-
             time = edge_data['time_cost']
-            
+            service_time += time     
+
+        # Fetch passenger time request    
         time_request = passengers_dict[passenger_index][2]
 
-        penalty_cost = time - time_request
-        total_penalty += penalty_cost
+        # Compute total delay of service for all passengers
+        penalty_cost = service_time - time_request
+        penalty_cost = max(penalty_cost,0) # no penalty for on-time service
+        total_delay += penalty_cost
 
         cpt+=1
 
-    return total_penalty
+    # Generate a penalty to be summed up to the transfer cost
+    delta = 0.3
+    pure_penalty = delta * (total_delay/len(passengers_in_chromosome))
+
+    return pure_penalty
 
 
 def ComputeMeanFitness(individuals, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t):
