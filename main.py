@@ -6,7 +6,7 @@ from solver import *
 
 # Algorithm parameters 
 N = 20                      #nb of individuals in the initial population
-nb_generations = 100        # nb of new generations in the population
+nb_generations = 500        # nb of new generations in the population
 proba_mutation = 0.4        #proba for an ind to be muted 
 w_f = 0.4                   # Weight for fuel cost
 w_t = 0.6                   # Weight for time cost
@@ -51,99 +51,173 @@ print("mean fitness tournament: ", mean_fitness_tournament)
 
 # 1 - Initialization 
 nb_iterations = 0 
-selection = "roulette" #tournament"
+selection1 = "roulette" 
+selection2 = "tournament"
 initial_population = generate_initial_pop(nb_individuals=N, nb_passengers=len(Passenger), capacities=vehicles_capacities)
-parent_population = initial_population
+
+# Roulette selection 
+parent_population1 = initial_population
+
+# Tournament selection 
+parent_population2 = initial_population
 
 # 2 - Prepare data for performance analytics 
-best_fitness_from_each_gen = []
-mean_fitness_first_X_ind_from_each_gen = []
+# Roulette selection
+best_fitness_from_each_gen1 = []
+mean_fitness_first_X_ind_from_each_gen1 = []
 X = 5
-mean_of_fitness_whole_pop_from_each_gen = []
+mean_of_fitness_whole_pop_from_each_gen1 = []
+
+# Tournament selection
+best_fitness_from_each_gen2 = []
+mean_fitness_first_X_ind_from_each_gen2 = []
+mean_of_fitness_whole_pop_from_each_gen2 = []
 
 # 3 - Running the algorithm
 while (nb_iterations <= nb_generations):     
 
-    child_population = GenerateNextGeneration(parent_population, Fitness, N, selection, proba_mutation, G, Transfer, Passenger, w_f, w_t)
-    #print(child_population)
-    parent_population = child_population 
+    # Roulette selection
+    child_population1 = GenerateNextGeneration(parent_population1, Fitness, N, selection1, proba_mutation, G, Transfer, Passenger, w_f, w_t)
+    parent_population1 = child_population1
+
+    # Tournament selection
+    child_population2 = GenerateNextGeneration(parent_population2, Fitness, N, selection2, proba_mutation, G, Transfer, Passenger, w_f, w_t)
+    parent_population2 = child_population2 
+
     nb_iterations += 1
 
-    # Fech data fro performance metrics
+    # Fech data for performance metrics
 
     # KPI1 : Fitness of the best individual of each generation 
-    sorted_child_population = sorted(child_population, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
-    test = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in sorted_child_population]
-    #print(test)
-    best_ind_from_child_pop = sorted_child_population[0]
-    best_fitness = Fitness(best_ind_from_child_pop, G, Transfer, Passenger, w_f, w_t)
-    #print(best_fitness)
-    #first_non_zero = next((value for value in test if value != 0), None)
-    #best_fitness = first_non_zero
-    best_fitness_from_each_gen.append(best_fitness)
+    # Roulette selection 
+    sorted_child_population1 = sorted(child_population1, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
+    best_ind_from_child_pop1 = sorted_child_population1[0]
+    best_fitness1 = Fitness(best_ind_from_child_pop1, G, Transfer, Passenger, w_f, w_t)
+    best_fitness_from_each_gen1.append(best_fitness1)
+    
+    # Tournament selection
+    sorted_child_population2 = sorted(child_population2, key=lambda ind: Fitness(ind, G, Transfer, Passenger, w_f, w_t))
+    best_ind_from_child_pop2 = sorted_child_population2[0]
+    best_fitness2 = Fitness(best_ind_from_child_pop2, G, Transfer, Passenger, w_f, w_t)
+    best_fitness_from_each_gen2.append(best_fitness2)
 
     # KPI2 : Fitness of the first X individuals of each generation for the mean 
-    top_individuals = sorted_child_population[:X]
-    top_fitnesses = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in top_individuals]
-    mean_of_the_fitness_of_first_X_individuals = np.mean(top_fitnesses)
-    mean_fitness_first_X_ind_from_each_gen.append(mean_of_the_fitness_of_first_X_individuals)
+    # Roulette selection
+    top_individuals1 = sorted_child_population1[:X]
+    top_fitnesses1 = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in top_individuals1]
+    mean_of_the_fitness_of_first_X_individuals1 = np.mean(top_fitnesses1)
+    mean_fitness_first_X_ind_from_each_gen1.append(mean_of_the_fitness_of_first_X_individuals1)
+
+    # Tournament selection 
+    top_individuals2 = sorted_child_population2[:X]
+    top_fitnesses2 = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in top_individuals2]
+    mean_of_the_fitness_of_first_X_individuals2 = np.mean(top_fitnesses2)
+    mean_fitness_first_X_ind_from_each_gen2.append(mean_of_the_fitness_of_first_X_individuals2)
 
     # KPI3 : Fitness of all individuals of each generation 
-    fitnesses_of_whole_gen = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in child_population]
-    mean_fitness_of_whole_pop = np.mean(fitnesses_of_whole_gen)
-    mean_of_fitness_whole_pop_from_each_gen.append(mean_fitness_of_whole_pop)
+    # Roulette selection
+    fitnesses_of_whole_gen1 = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in child_population1]
+    mean_fitness_of_whole_pop1 = np.mean(fitnesses_of_whole_gen1)
+    mean_of_fitness_whole_pop_from_each_gen1.append(mean_fitness_of_whole_pop1)
+
+    # Tournament selection 
+    fitnesses_of_whole_gen2 = [Fitness(ind, G, Transfer, Passenger, w_f, w_t) for ind in child_population2]
+    mean_fitness_of_whole_pop2 = np.mean(fitnesses_of_whole_gen2)
+    mean_of_fitness_whole_pop_from_each_gen2.append(mean_fitness_of_whole_pop2)
 
 
 # Plotting
 generation_indices = range(nb_generations+1)
 
-# NB : try with different selection processes 
-
-#print(best_fitness_from_each_gen)
-#print(mean_fitness_first_X_ind_from_each_gen)
-#print(mean_of_fitness_whole_pop_from_each_gen)
-
 # PLOT 1 : evolution of the fitness along the reproduction process (best fitness for each gen)
-plt.plot(generation_indices[::5], best_fitness_from_each_gen[::5], label="Evolution of the best fitness of each generation")
+# Roulette selection
+plt.plot(generation_indices[::25], best_fitness_from_each_gen1[::25], label="Evolution of the best fitness of each generation")
 plt.xlabel('Generation')
 plt.ylabel('Best fitness')
-plt.title(f"Evolution of the best fitness over the {nb_generations} generations for a population of {N} individuals")
+plt.title(f"Evolution of the best fitness for a population of {N} individuals")
 #figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'best_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot1.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot1_r.png')
+plt.savefig(figure_path)
+plt.close()
+
+# Tournament selection 
+plt.plot(generation_indices[::25], best_fitness_from_each_gen2[::25], label="Evolution of the best fitness of each generation")
+plt.xlabel('Generation')
+plt.ylabel('Best fitness')
+plt.title(f"Evolution of the best fitness for a population of {N} individuals")
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'best_fitness.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot1_t.png')
 plt.savefig(figure_path)
 plt.close()
 
 # PLOT 2 : evolution of the mean of the fitness of the X best individuals along the reproduction process 
-plt.plot(generation_indices[::5], mean_fitness_first_X_ind_from_each_gen[::5], label='Evolution of the mean of the fitness of the f"{X} first best individuals')
+# Roulette selection
+plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen1[::25], label='Evolution of the mean of the fitness of the f"{X} first best individuals')
 plt.xlabel('Generation')
-plt.ylabel(f'Mean of fitnesses of the {X} best individuals of the generation')
-plt.title(f"Evolution of the mean fitness of the {X} best individuals over the {nb_generations} generations for a population of {N} individuals")
+plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
+plt.title(f"Evolution of the mean fitness of the {X} best individuals")
 #figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_best_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot2.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot2_r.png')
+plt.savefig(figure_path)
+plt.close()
+
+# Roulette selection
+plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen2[::25], label='Evolution of the mean of the fitness of the f"{X} first best individuals')
+plt.xlabel('Generation')
+plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
+plt.title(f"Evolution of the mean fitness of the {X} best individuals")
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_best_fitness.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot2_t.png')
 plt.savefig(figure_path)
 plt.close()
 
 # PLOT 3 : evolution of the mean of the fitness of all individuals along the reproduction process 
-plt.plot(generation_indices[::5], mean_of_fitness_whole_pop_from_each_gen[::5], label="Evolution of the mean fitness of the whole population")
+# Roulette selection
+plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen1[::25], label="Evolution of the mean fitness of the whole population")
 plt.xlabel('Generation')
 plt.ylabel('Mean of fitnesses of all individuals')
-plt.title(f"Evolution of the mean fitness over the {nb_generations} generations for a population of {N} individuals")
+plt.title(f"Evolution of the mean fitness of the whole population")
 #figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_fitness.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot3.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot3_r.png')
+plt.savefig(figure_path)
+plt.close()
+
+# Tournament selection
+plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen2[::25], label="Evolution of the mean fitness of the whole population")
+plt.xlabel('Generation')
+plt.ylabel('Mean of fitnesses of all individuals')
+plt.title(f"Evolution of the mean fitness of the whole population")
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'mean_fitness.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot3_t.png')
 plt.savefig(figure_path)
 plt.close()
 
 # PLOT 4 : all 3 curves 
+# Roulette selection
 plt.figure(figsize=(14,12))
-plt.plot(generation_indices[::5], best_fitness_from_each_gen[::5], 'b', label="Evolution of the best fitness")
-plt.plot(generation_indices[::5], mean_fitness_first_X_ind_from_each_gen[::5], 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
-plt.plot(generation_indices[::5], mean_of_fitness_whole_pop_from_each_gen[::5], 'g', label="Evolution of the mean fitness of the whole population")
+plt.plot(generation_indices[::25], best_fitness_from_each_gen1[::25], 'b', label="Evolution of the best fitness")
+plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen1[::25], 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
+plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen1[::25], 'g', label="Evolution of the mean fitness of the whole population")
 plt.xlabel('Generation')
 plt.ylabel('Fitness')
 plt.title(f"Evolution of the fitnesses over the {nb_generations} generations for a population of {N} individuals")
 plt.legend()
 #figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'fitness_evolution.png')
-figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot4.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot4_r.png')
+plt.savefig(figure_path)
+plt.close()
+
+# Tournament selection
+plt.figure(figsize=(14,12))
+plt.plot(generation_indices[::25], best_fitness_from_each_gen2[::25], 'b', label="Evolution of the best fitness")
+plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen2[::25], 'r', label=f"Evolution of the mean fitness of the {X} best individuals")
+plt.plot(generation_indices[::25], mean_of_fitness_whole_pop_from_each_gen2[::25], 'g', label="Evolution of the mean fitness of the whole population")
+plt.xlabel('Generation')
+plt.ylabel('Fitness')
+plt.title(f"Evolution of the fitnesses over the {nb_generations} generations for a population of {N} individuals")
+plt.legend()
+#figure_path = os.path.join(r'C:\Users\marco\Documents\GitHub\DARP_Project\plots', 'fitness_evolution.png')
+figure_path = os.path.join(r'C:\Users\mathi\OneDrive\Documents\0_ECOLE\2_POLITO\ORTA\FINAL PROJECT', 'plot4_t.png')
 plt.savefig(figure_path)
 plt.close()
 

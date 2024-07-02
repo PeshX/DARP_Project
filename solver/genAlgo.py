@@ -335,7 +335,6 @@ def RouletteWheelSelection(population, Fitness, graph, transfer_LUT, passenger_L
 
 
 def TournamentSelection(population, Fitness, graph, transfer_LUT, passenger_LUT, w_f, w_t, tournament_size): 
-
     """
     @param population: a pool of individuals/solutions 
     @param Fitness: the numeric function that evaluates the "goodness" of a solution 
@@ -344,7 +343,7 @@ def TournamentSelection(population, Fitness, graph, transfer_LUT, passenger_LUT,
     @param passenger_LUT: dictionary of the passengers
     @param w_f: weight for the fuel attribute of the graph's edges
     @param w_t: weight for the time attribute of the graph's edges
-    @param tournamen_size, the nb of individuals to participate in each tournament 
+    @param tournament_size: the number of individuals to participate in each tournament 
 
     @return a list of selected solutions/individuals, according to the simple tournament selection process based on fitness 
     """
@@ -352,15 +351,14 @@ def TournamentSelection(population, Fitness, graph, transfer_LUT, passenger_LUT,
     selected_ind = []
     population_size = len(population)
 
-    for _ in range(population_size):
-        tournament = random.sample(population, tournament_size) # random select of a sample individuals in the pop to participate in the tournament 
+    while len(selected_ind) < population_size:
+        tournament = random.sample(population, tournament_size) # random select of a sample of individuals in the population to participate in the tournament
         
         tournament_fitnesses = [Fitness(ind, graph, transfer_LUT, passenger_LUT, w_f, w_t) for ind in tournament]
         
-        best_individual = tournament[tournament_fitnesses.index(max(tournament_fitnesses))]
+        best_individual = tournament[tournament_fitnesses.index(min(tournament_fitnesses))]
         
-        if best_individual not in selected_ind:
-            selected_ind.append(best_individual)
+        selected_ind.append(best_individual)
 
     return selected_ind
 
