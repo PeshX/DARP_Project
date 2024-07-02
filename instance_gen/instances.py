@@ -48,8 +48,38 @@ def createPassengersTransfersBatch(nb_passengers, nb_transfer):
         
     # Cut out duplicates
     Nodes = list(set(Nodes_List))
+    
+    # Check for feasibility of input parameters and created instance
+    sum_capacities = 0
+    try:
+        # Define your condition here
+     for i in range(nb_transfer):
+        sum_capacities += looUpTableTransfers[i+1][2] 
+
+     if nb_passengers > sum_capacities:
+         my_condition = False 
+     else:
+         my_condition = True      
+
+     # Check the condition
+     check_condition(my_condition)
+    except ValueError as e:
+        print(e)
+        exit(1)
 
     return looUpTableTransfers, looUpTablePassengers, Nodes
+
+def check_condition(condition):
+
+    """
+    Raise the exception if condition is not met
+    
+    @param condition: boolean value according to previous check
+    
+    """
+
+    if not condition:
+        raise ValueError("Instance of passengers and transfers NOT feasible!")
 
 
 def createGraphInstance(nodes_list, min_weight_fuel, max_weight_fuel, min_weight_time, max_weight_time, min_degree):

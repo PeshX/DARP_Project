@@ -11,7 +11,7 @@ proba_mutation = 0.4        #proba for an ind to be muted
 w_f = 0.4                   # Weight for fuel cost in the fitness
 w_t = 0.6                   # Weight for time cost in the fitness
 nb_passengers = 20          # Number of passengers  
-nb_transfers = 4            # Number of transfers -> consider a capacity of
+nb_transfers = 4            # Number of transfers -> consider a capacity from 5 to 10
 min_fuel = 1                # min fuel weight for edges
 max_fuel = 10               # max fuel weight froi edges
 min_time = 5                # min time weight for edges
@@ -163,7 +163,7 @@ plt.plot(generation_indices[::25], mean_fitness_first_X_ind_from_each_gen1[::25]
 plt.xlabel('Generation')
 plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
 plt.title(f"Evolution of the mean fitness of the {X} best individuals")
-figure_path = os.path.join(user_path, 'plot2_r.png.png')
+figure_path = os.path.join(user_path, 'plot2_r.png')
 plt.savefig(figure_path)
 plt.close()
 
@@ -173,6 +173,7 @@ plt.xlabel('Generation')
 plt.ylabel(f'Mean of fitnesses of the {X} best individuals')
 plt.title(f"Evolution of the mean fitness of the {X} best individuals")
 figure_path = os.path.join(user_path, 'plot2_t.png')
+plt.savefig(figure_path)
 plt.close()
 
 # PLOT 3 : evolution of the mean of the fitness of all individuals along the reproduction process 
