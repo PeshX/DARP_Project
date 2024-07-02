@@ -13,6 +13,11 @@ In main.py, from line 9  to lin x the parameters for the execution of the code c
 > A fully functioning example is already provided, considering a reasonable run-time of x minutes (can vary accoridng to PC).
 > Lastly, only a coarse tuning of the parameters has been done, hence the project will always work but may return sub-optimal performance due to some numerical settings in its hidden functions (like the weights of the graph or the time requests of the passengers)
 
+Current values are:
+1. rr
+2. rirt
+
+
 ## Execution of the code
 The code is ready-to-run and right after it has been correctly downloaded 
 
