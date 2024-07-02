@@ -21,8 +21,7 @@ The code is ready-to-run and right after it has been correctly downloaded it can
 > If the 'r' is not present before the path, the code will not start.
 
 ## Results and Generated plots
-Once the execution of the code has ended, the results regarding the overall fitness values of the GA will be available in the 'plot' folder. Since we implemented two selection operators (roulette_wheel and tournament), the name of the figures will be 'plotX_r' if it regards the roulette while 'plotX_t' if it regards the tournament, with X going from 1 to 4. Overall, 8 plots will be generated.\
-In addition, on the terminal it will be printed:
+Once the execution of the code has ended, the results regarding the overall fitness values of the GA will be available in the 'plot' folder. Since we implemented two selection operators (roulette_wheel and tournament), the name of the figures will be 'plotX_r' if it regards the roulette while 'plotX_t' if it regards the tournament, with X going from 1 to 4. Overall, 8 plots will be generated. In addition, on the terminal it will be printed:
 - number of nodes in the current graph
 - the best individual obtained with roulette wheel selection and its fitness
 - the best individual obtained with tournament selection and its fitness
